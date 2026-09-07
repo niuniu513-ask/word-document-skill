@@ -16,12 +16,13 @@
    - 模板空表:{"type": "table_fill", "table_index": <analyze 的表序号>, "cells": {...}}
    - 新增表/图:table / image 块,同样挂 after 锚点
    - 模板缺章节而资料需要:heading 块(numbering 按模板体系,参照 references/report-writing.md)
+   - 模板已有封面标题、课程名、校名或固定说明时,将其作为受保护文本保留;不要用资料标题或普通 `heading` 块覆盖。
 3. **生成**(insert 为主):
    ```bash
    generate_docx.py --template 模板.docx --content content.json -o 输出.docx
    ```
 4. **核对 warnings**:missing_placeholders 逐个处理;锚点未匹配的块改锚点重跑(锚点直接从 analyze outline 复制)。
-5. **验证闭环**:delta(相对模板,允许项=新增内容表格与填充文本)+ 渲染逐页检查,重点:封面填齐没溢出、每个模板标题下都有内容且位置正确、表格数据行数撑版、目录页码已更新。
+5. **验证闭环**:delta(相对模板,允许项=新增内容表格与填充文本)+ 渲染逐页检查,重点:封面填齐没溢出、每个模板标题下都有内容且位置正确、表格数据行数撑版、目录页码已更新。若使用 `rebuild`,逐字核对封面/前置块固定文本仍与模板一致;标题不一致属于警告,不是自动改写理由。
 
 ## 资料不足时
 

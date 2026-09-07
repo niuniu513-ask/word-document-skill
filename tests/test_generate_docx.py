@@ -122,3 +122,36 @@ class TestGenerateDocx:
         assert "张三" in full_text
         assert "2024001" in full_text
         assert "{{name}}" not in full_text
+
+    def test_rebuild_preserves_fixed_template_title(self, tmp_path):
+        """Rebuild must keep fixed cover text even when source content has another title."""
+        from docx import Document
+
+        template_doc = Document()
+        template_doc.add_paragraph("《系统设计创新与电子系统设计实践》")
+        template_doc.add_paragraph("小组拟题及方案设计报告")
+        template_doc.add_heading("模板正文起点", level=1)
+        template_doc.add_paragraph("旧正文，rebuild 后应被移除。")
+        template = tmp_path / "protected-template.docx"
+        template_doc.save(str(template))
+
+        content = {
+            "blocks": [
+                {"type": "heading", "level": 1, "text": "源资料中的另一个标题"},
+                {"type": "paragraph", "text": "新的正文内容。"},
+            ]
+        }
+        content_path = tmp_path / "content.json"
+        content_path.write_text(json.dumps(content, ensure_ascii=False), encoding="utf-8")
+        out = tmp_path / "output.docx"
+
+        from generate_docx import main as gen_main
+        sys.argv = ["generate_docx.py", "--template", str(template),
+                    "--content", str(content_path), "-o", str(out), "--mode", "rebuild"]
+        assert gen_main() == 0
+
+        result = Document(str(out))
+        texts = [p.text for p in result.paragraphs]
+        assert texts[:2] == ["《系统设计创新与电子系统设计实践》", "小组拟题及方案设计报告"]
+        assert "源资料中的另一个标题" in texts
+        assert "旧正文，rebuild 后应被移除。" not in texts

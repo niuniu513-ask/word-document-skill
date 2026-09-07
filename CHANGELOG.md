@@ -5,6 +5,12 @@ All notable changes to **word-document-skill** are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2026-09-07
+
+### Fixed
+- 明确并回归测试模板固定文本保护：`rebuild` 仅重建正文，封面标题、课程名、校名和固定说明默认逐字保留。
+- 补充模板填充工作流对“模板标题与源资料标题不一致”的处理规则，默认以模板为准并提示用户。
+
 ## [1.0.0] - 2026-09-07
 
 ### Added
