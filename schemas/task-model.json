@@ -1,0 +1,59 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Task Model",
+  "description": "Phase 0 任务识别的输出。agent 内部使用,用于选择工作流并在交付时自检优先级链是否被遵守。",
+  "type": "object",
+  "required": ["task_type", "inputs", "priority_constraints"],
+  "properties": {
+    "task_type": {
+      "type": "string",
+      "enum": [
+        "analyze-only", "create-new", "template-fill", "edit-existing",
+        "rewrite-content", "polish-content", "expand-content", "summarize",
+        "fill-form", "insert-images", "insert-tables", "adjust-layout",
+        "repair-formatting", "format-migration", "content-migration",
+        "batch-generate", "document-convert", "document-organize",
+        "document-compare", "other-word-task"
+      ]
+    },
+    "inputs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "path": {"type": "string"},
+          "role": {
+            "type": "string",
+            "description": "template(格式权威) | source(内容来源) | material(资料) | target(被编辑对象) | reference(仅参考)",
+            "enum": ["template", "source", "material", "target", "reference"]
+          },
+          "analyzed": {"type": "boolean", "description": "是否已产出 Document Specification"}
+        }
+      }
+    },
+    "outputs": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "priority_constraints": {
+      "type": "object",
+      "description": "铁律优先级链在本任务上的实例化",
+      "properties": {
+        "explicit_user_demands": {"type": "array", "items": {"type": "string"}},
+        "format_authority": {"type": "string", "description": "格式以哪个文件/要求为准"},
+        "formatting_delta_budget": {
+          "type": "string",
+          "description": "允许的格式变化范围;默认 '≈0,仅限用户要求的改动'",
+          "default": "≈0"
+        },
+        "fact_policy": {
+          "type": "string",
+          "description": "missing=【待补充】 / simulated=用户要求且标【模拟数据】 / provided=全部来自资料",
+          "enum": ["missing", "simulated", "provided"]
+        }
+      }
+    },
+    "workflow": {"type": "string", "description": "选定的 workflows/*.md"},
+    "ambiguity_note": {"type": "string", "description": "任务歧义与所采取的假设"}
+  }
+}

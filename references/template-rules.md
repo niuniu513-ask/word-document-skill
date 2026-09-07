@@ -1,0 +1,57 @@
+# 模板规则(Template Rules)
+
+模板填充、格式迁移、内容迁移共用的规则。对象是"用户给的 .docx 模板"。
+
+## 1. 模板的本质
+
+模板不是图片,是一个完整文档:封面(常带占位符)+ 固定结构(标题/表格)+ 样式体系 + 页眉页脚。操作目标是**让内容住进它的体系**,因此默认策略:
+
+1. **物理复制模板文件作为输出起点**(generate_docx.py --template 就是这么做的),样式、节、页眉页脚、theme 全部原样继承;
+2. 填占位符,而不是重画封面;
+3. 有锚点的块走 insert(逐标题插入),只有用户明确要"重新组织正文"才 rebuild。
+
+三种模式怎么选(generate_docx.py --mode):
+
+| 模式 | 行为 | 适用 |
+|---|---|---|
+| insert | 文档原样保留,带 `after` 锚点的块插入到匹配标题之后 | 模板已有标题骨架,最常用、最安全 |
+| fill | 只填占位符 + 无锚点块追加文末 | 表单型模板、封面填空 |
+| rebuild | 保留封面(首个标题前的全部),删除其后正文,用内容块重建 | 模板只有封面,或用户要求重排正文 |
+
+auto 逻辑:内容块带锚点 → insert;模板有标题无锚点 → rebuild;否则 fill。
+
+## 2. 占位符识别与填充
+
+generate_docx.py 的 fill_placeholders 支持三种写法,扫描范围含正文与全部表格:
+
+1. 显式 token:`{{姓名}}`、`【姓名】`、`{ 姓名 }`
+2. 下划线空位:`姓名:____________`(标签字符间允许宽间隔,如"学    院")
+3. content.json 的 cover.fields 里 key 写法要和 analyze 报告的 `cover.fields_detected` 对齐(脚本做了空格宽容匹配,但"指导教师"别写成"老师")
+
+注意:
+
+- 填充后 spec 里检测到却没填上的占位符会出现在 warnings(`missing_placeholders`)——**必须处理**:要么补数据,要么在交付说明里列为 `【待补充】`。
+- 封面若用文本框排版(`package_flags.has_textboxes`),python-docx 填不到,需要 XML 级替换 `w:txbxContent` 里的 `w:t`;改完务必渲染检查,文本框最容易溢出。
+- 表格型封面(信息表):用 table_fill 逐格填。
+
+## 3. 表格填充纪律
+
+- table_fill 的 `table_index` 是**原模板**表格序号(analyze spec 的 tables[].index),所以 fill/insert 模式下先填、rebuild 下无效(原表已删)。
+- 单元格地址 "行,列" 从 0 起;含合并单元格的表,先看 analyze 的 `merged_cells` 提示,值写在合并区左上角单元格。
+- 填完渲染检查:文字是否溢出单元格、行高是否被撑破、跨页是否断得难看(表头重复 `header_row_repeat` 可在模板层修)。
+
+## 4. 目录(TOC)
+
+- 模板带 TOC 域(`toc.present`)且内容有增删 → 交付前必须 `render_docx.py --update-fields`(Word COM 更新 TOC 与所有域并回存 docx)。
+- 目录样式(TOC 1-9)属于模板体系,不要重排目录文本;更新域即可。
+- 模板没目录而用户要求有:优先让用户在 Word 里"引用→目录"自动生成;确需脚本插入时用 TOC 域 + update-fields,禁止手打目录。
+
+## 5. 保留清单(格式迁移/重建时的底线)
+
+rebuild 或新建时,这些必须原样保留或复刻(以模板 spec 为准):页面尺寸与四边距、节结构与分节符位置、页眉页脚内容与页码域、样式表(至少 body/heading/caption 的字体行距)、表格样式。validate_docx.py --original 模板 --final 产出 就是这道底线的技术实现,delta 必须 ≈ 0(允许项:用户明确要求的变化、新增的内容表格)。
+
+## 6. 受保护/受限模板
+
+- 打开报错或 python-docx 抛异常:先确认文件没被占用(用户可能正开着 Word),提示关闭后重试。
+- 有 `w:documentProtection`:只读分析可以,写入会被 Word 拒绝或被 Word 忽略格式;告知用户需解除保护。
+- 模板里带修订(`has_revisions`)或批注(`has_comments`):填充前问用户"保留还是先清理";默认保留,不擅自 accept all。

@@ -1,0 +1,101 @@
+{
+  "meta": {
+    "title": "示例：实验报告内容模型",
+    "description": "演示 content.json 的各种块类型。配合 generate_docx.py --template 或 --spec 使用。"
+  },
+  "blocks": [
+    {
+      "type": "cover",
+      "fields": {
+        "姓名": "张三",
+        "学号": "2024010101",
+        "学院": "信息科学与技术学院",
+        "专业": "人工智能",
+        "班级": "【待补充:班级】",
+        "实验日期": "2026年9月7日"
+      }
+    },
+    {
+      "type": "heading",
+      "level": 1,
+      "text": "一、实验目的",
+      "numbering": "native"
+    },
+    {
+      "type": "paragraph",
+      "after": "一、实验目的",
+      "text": "掌握单摆法测量重力加速度的原理与方法，学习使用游标卡尺和电子秒表，理解误差分析的基本思路。"
+    },
+    {
+      "type": "heading",
+      "level": 1,
+      "text": "二、实验仪器",
+      "numbering": "native"
+    },
+    {
+      "type": "table_fill",
+      "table_index": 0,
+      "cells": {
+        "1,0": "米尺",
+        "1,1": "0-100cm",
+        "1,2": "0.1cm",
+        "2,0": "游标卡尺",
+        "2,1": "0-15cm",
+        "2,2": "0.002cm",
+        "3,0": "电子秒表",
+        "3,1": "0-30min",
+        "3,2": "0.01s"
+      }
+    },
+    {
+      "type": "heading",
+      "level": 1,
+      "text": "三、实验原理",
+      "numbering": "native"
+    },
+    {
+      "type": "paragraph",
+      "after": "三、实验原理",
+      "text": "单摆的周期公式为 T = 2π√(L/g)，由此可得 g = 4π²L/T²。通过测量不同摆长下的周期，拟合 T²-L 直线，斜率即为 4π²/g。"
+    },
+    {
+      "type": "heading",
+      "level": 1,
+      "text": "四、数据记录与处理",
+      "numbering": "native"
+    },
+    {
+      "type": "table",
+      "after": "四、数据记录与处理",
+      "rows": [
+        ["摆长 L (cm)", "30T₁ (s)", "30T₂ (s)", "30T₃ (s)", "平均 T (s)"],
+        ["50.00", "42.35", "42.40", "42.38", "1.412"],
+        ["70.00", "50.12", "50.15", "50.10", "1.670"],
+        ["90.00", "56.88", "56.90", "56.85", "1.897"]
+      ],
+      "caption": "表1 单摆周期测量数据",
+      "header_row": true
+    },
+    {
+      "type": "image",
+      "after": "四、数据记录与处理",
+      "path": "figures/fit_curve.png",
+      "width_cm": 12,
+      "caption": "图1 T²-L 拟合曲线"
+    },
+    {
+      "type": "heading",
+      "level": 1,
+      "text": "五、结果与分析",
+      "numbering": "native"
+    },
+    {
+      "type": "paragraph",
+      "after": "五、结果与分析",
+      "text": "由拟合直线斜率计算得 g = 9.79 m/s²，与当地标准值 g₀ = 9.794 m/s² 的相对误差约为 0.04%。误差主要来源于摆长测量和周期计时。"
+    },
+    {
+      "type": "page_break"
+    }
+  ]
+}

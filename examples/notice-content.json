@@ -1,0 +1,37 @@
+{
+  "meta": {
+    "title": "示例：通知文档内容模型",
+    "description": "用于格式迁移或新建通知类文档。"
+  },
+  "blocks": [
+    {
+      "type": "heading",
+      "level": 1,
+      "text": "关于举办人工智能与产业应用专题讲座的通知"
+    },
+    {
+      "type": "paragraph",
+      "text": "各学院、各部门："
+    },
+    {
+      "type": "paragraph",
+      "text": "为拓宽师生视野，学校定于2026年10月20日下午2:30在图书馆报告厅举办人工智能与产业应用专题讲座，主讲人为张伟教授。"
+    },
+    {
+      "type": "paragraph",
+      "text": "请各单位组织师生准时参加，并于10月18日前将参加人数报送教务处。"
+    },
+    {
+      "type": "paragraph",
+      "text": "特此通知。"
+    },
+    {
+      "type": "paragraph",
+      "text": "教务处"
+    },
+    {
+      "type": "paragraph",
+      "text": "2026年9月28日"
+    }
+  ]
+}

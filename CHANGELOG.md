@@ -1,0 +1,30 @@
+# Changelog
+
+All notable changes to **word-document-skill** are documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [1.0.0] - 2026-09-07
+
+### Added
+- **Document Analyzer** (`analyze_docx.py`): full Document Specification output — page setup, styles (three-track font resolution via basedOn chain), outline with native/manual numbering, tables (col widths, merges, header repeat), images (distortion detection), headers/footers with PAGE/TOC fields, cover & TOC detection, formatting inventory (actual run fonts/colors), and an `issues` list.
+- **Content Extractor** (`extract_content.py`): structured content-model JSON + Markdown view, preserving heading levels, table rows, captions, and image positions.
+- **Style Inspector** (`inspect_styles.py`): detailed style report with basedOn chain and effective formatting.
+- **Generator** (`generate_docx.py`): three modes — `insert` (anchor-based, least invasive), `fill` (placeholder-only), `rebuild` (keep cover, rebuild body). Supports `{{key}}`, `【key】`, and wide-spaced label+underscore placeholders; content blocks: cover, heading, paragraph, table, table_fill, image, caption, page_break.
+- **Renderer** (`render_docx.py`): Word COM (Windows, most faithful) → LibreOffice fallback; PDF + per-page PNG; `--update-fields` refreshes TOC/PAGE.
+- **Validator** (`validate_docx.py`): Format Delta (original vs final, sections/styles/headers/tables/images) + structural sanity check (empty paragraphs, distorted images, orphan headings, manual page numbers, overflow tables).
+- **Repair** (`repair_docx.py`): dry-run by default; fixes empty-paragraphs, heading-keepnext, image-aspect, manual-pagenum, fake-headings.
+- **JSON Schemas**: `document-spec.json`, `content-model.json`, `task-model.json`.
+- **7 Workflows**: analyze, generate, edit, template-fill, format-migration, content-migration, batch-generate.
+- **7 Reference docs**: document-analysis, word-style-rules, template-rules, report-writing, document-editing, visual-qa, repair-rules.
+- **4 Eval cases**: template-fill (lab report), format-migration (notice), precision-edit, layout-repair.
+
+### Fixed
+- `add_caption` duplicate text when caption style exists.
+- Removed dead code in `load_numbering`.
+- Consolidated duplicate `package_flags_orig/final` helpers.
+
+### Security
+- All scripts use `sys.path.insert` for local imports; no arbitrary code execution.
+- `render_docx.py` operates on a copy when `--update-fields` is used to avoid mutating user originals unexpectedly.

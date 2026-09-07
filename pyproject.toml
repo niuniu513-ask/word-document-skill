@@ -1,0 +1,67 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "word-document-skill"
+version = "1.0.0"
+description = "Word Document Intelligence: analyze, generate, edit, and repair .docx files while preserving the original formatting system."
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+authors = [
+    {name = "word-document-skill contributors"},
+]
+keywords = ["word", "docx", "document", "agent-skill", "python-docx", "formatting"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Office/Business :: Office Suites",
+    "Topic :: Text Processing :: Markup",
+]
+dependencies = [
+    "python-docx>=1.1.0",
+    "lxml>=4.9.0",
+    "Pillow>=9.0.0",
+]
+
+[project.optional-dependencies]
+render = ["PyMuPDF>=1.23.0"]
+windows = ["pywin32>=306"]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "ruff>=0.1.0",
+    "mypy>=1.5.0",
+    "build>=1.0",
+]
+
+[project.scripts]
+docx-analyze = "scripts.analyze_docx:main"
+docx-generate = "scripts.generate_docx:main"
+docx-validate = "scripts.validate_docx:main"
+docx-render = "scripts.render_docx:main"
+docx-repair = "scripts.repair_docx:main"
+docx-extract = "scripts.extract_content:main"
+docx-inspect-styles = "scripts.inspect_styles:main"
+
+[tool.setuptools.packages.find]
+include = ["scripts*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B"]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]

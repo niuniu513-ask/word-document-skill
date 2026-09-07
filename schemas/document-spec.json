@@ -1,0 +1,226 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Document Specification",
+  "description": "analyze_docx.py 的输出:一份 docx 的完整格式体系描述。agent 以此为操作依据。",
+  "type": "object",
+  "required": ["file", "document", "sections"],
+  "additionalProperties": true,
+  "properties": {
+    "file": {
+      "type": "object",
+      "properties": {
+        "path": {"type": "string"},
+        "name": {"type": "string"},
+        "size_kb": {"type": "number"},
+        "analyzed_at": {"type": "string"}
+      }
+    },
+    "document": {
+      "type": "object",
+      "properties": {
+        "package_flags": {
+          "type": "object",
+          "description": "批注/修订/超链接/文本框/内容控件/媒体数量/宏等包级标志",
+          "additionalProperties": true
+        },
+        "field_types_used": {"type": "object", "description": "域类型 -> 出现次数,如 PAGE/TOC/REF"},
+        "body_block_count": {"type": "integer"},
+        "paragraph_count": {"type": "integer"},
+        "table_count": {"type": "integer"},
+        "image_count": {"type": "integer"},
+        "section_count": {"type": "integer"}
+      }
+    },
+    "doc_defaults": {
+      "type": "object",
+      "description": "styles.xml docDefaults 的默认字体与段落设置",
+      "properties": {
+        "font": {
+          "type": "object",
+          "properties": {
+            "ascii": {"type": ["string", "null"]},
+            "eastAsia": {"type": ["string", "null"]},
+            "size_pt": {"type": ["number", "null"]}
+          }
+        }
+      }
+    },
+    "sections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["page", "margins_cm"],
+        "properties": {
+          "index": {"type": "integer"},
+          "page": {
+            "type": "object",
+            "properties": {
+              "width_cm": {"type": "number"},
+              "height_cm": {"type": "number"},
+              "orientation": {"type": ["string", "null"]}
+            }
+          },
+          "margins_cm": {
+            "type": "object",
+            "properties": {
+              "top": {"type": ["number", "null"]},
+              "bottom": {"type": ["number", "null"]},
+              "left": {"type": ["number", "null"]},
+              "right": {"type": ["number", "null"]},
+              "gutter": {"type": ["number", "null"]},
+              "header": {"type": ["number", "null"]},
+              "footer": {"type": ["number", "null"]}
+            }
+          },
+          "first_page_different": {"type": "boolean"},
+          "headers": {"type": "object"},
+          "footers": {"type": "object"},
+          "page_number": {
+            "type": "object",
+            "properties": {
+              "format": {"type": ["string", "null"]},
+              "start": {"type": ["string", "null"]}
+            }
+          }
+        }
+      }
+    },
+    "styles": {
+      "type": "array",
+      "description": "全部已定义样式;字体/段落为基于 basedOn 链解析后的有效值",
+      "items": {
+        "type": "object",
+        "required": ["name", "style_id", "type"],
+        "properties": {
+          "name": {"type": ["string", "null"]},
+          "style_id": {"type": "string"},
+          "type": {"type": ["string", "null"], "description": "PARAGRAPH | CHARACTER | TABLE | NUMBERING"},
+          "builtin": {"type": ["boolean", "null"]},
+          "based_on": {"type": ["string", "null"]},
+          "font": {
+            "type": "object",
+            "properties": {
+              "ascii": {"type": ["string", "null"]},
+              "eastAsia": {"type": ["string", "null"]},
+              "hAnsi": {"type": ["string", "null"]},
+              "size_pt": {"type": ["number", "null"]},
+              "bold": {"type": ["boolean", "null"]},
+              "italic": {"type": ["boolean", "null"]},
+              "underline": {"type": ["boolean", "null"]},
+              "color": {"type": ["string", "null"]},
+              "color_theme": {"type": ["string", "null"], "description": "主题色名称；显式RGB色优先看color"}
+            }
+          },
+          "paragraph": {
+            "type": "object",
+            "properties": {
+              "alignment": {"type": ["string", "null"]},
+              "line_spacing": {"type": ["number", "null"]},
+              "line_rule": {"type": ["string", "null"]},
+              "before_pt": {"type": ["number", "null"]},
+              "after_pt": {"type": ["number", "null"]},
+              "first_line_indent_cm": {"type": ["number", "null"]},
+              "left_indent_cm": {"type": ["number", "null"]},
+              "keep_with_next": {"type": ["boolean", "null"]},
+              "page_break_before": {"type": ["boolean", "null"]},
+              "outline_level": {"type": ["integer", "null"]}
+            }
+          }
+        }
+      }
+    },
+    "outline": {
+      "type": "array",
+      "description": "标题大纲(文档骨架)",
+      "items": {
+        "type": "object",
+        "properties": {
+          "level": {"type": "integer", "description": "1 起"},
+          "style": {"type": "string"},
+          "text": {"type": "string"},
+          "native_numbering": {"type": ["string", "null"], "description": "原生编号渲染文本,如 '一、'"},
+          "manual_number": {"type": ["string", "null"], "description": "文字中检测到的手工编号,如 '1.1'"},
+          "index": {"type": "integer", "description": "body 顺序号,供编辑定位"}
+        }
+      }
+    },
+    "tables": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "index": {"type": "integer", "description": "table_fill 的 table_index"},
+          "body_index": {"type": "integer"},
+          "rows": {"type": ["integer", "null"]},
+          "cols": {"type": ["integer", "null"]},
+          "style": {"type": ["string", "null"]},
+          "col_widths_cm": {"type": ["array", "null"], "items": {"type": ["number", "null"]}},
+          "merged_cells": {"type": "integer"},
+          "header_row_repeat": {"type": "boolean"},
+          "borders": {"type": ["string", "null"]},
+          "preview": {"type": "array", "items": {"type": "array"}}
+        }
+      }
+    },
+    "images": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "index": {"type": "integer"},
+          "type": {"type": "string", "description": "inline | anchored | legacy-vml"},
+          "paragraph_index": {"type": "integer"},
+          "width_cm": {"type": ["number", "null"]},
+          "height_cm": {"type": ["number", "null"]},
+          "native_px": {"type": ["array", "null"], "items": {"type": "integer"}},
+          "distorted": {"type": ["boolean", "null"], "description": "显示比例与原始像素比是否失真 >2%"},
+          "caption_guess": {"type": ["string", "null"]}
+        }
+      }
+    },
+    "cover": {
+      "type": "object",
+      "properties": {
+        "present": {"type": "boolean"},
+        "confidence": {"type": "number"},
+        "fields_detected": {"type": "array", "items": {"type": "string"}},
+        "placeholders_preview": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "toc": {
+      "type": "object",
+      "properties": {
+        "present": {"type": "boolean"},
+        "detected_via": {"type": "array", "items": {"type": "string"}},
+        "entries_preview": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "formatting_inventory": {
+      "type": "object",
+      "description": "正文、表格、页眉页脚中实际文字运行的字体与字色使用清单",
+      "properties": {
+        "run_count": {"type": "integer"},
+        "dominant": {"type": ["object", "null"], "description": "出现次数最多的有效字体/字号/字色组合"},
+        "font_combinations": {"type": "array", "description": "实际使用的中西文字体与字号组合，按频次降序"},
+        "colors": {"type": "array", "description": "实际使用的RGB色、主题色或默认色，按频次降序"},
+        "mixed_fonts": {"type": "boolean"},
+        "mixed_colors": {"type": "boolean"}
+      }
+    },
+    "conventions": {
+      "type": "object",
+      "description": "文档的写作惯例汇总——生成/插入内容时直接沿用",
+      "properties": {
+        "body_style": {"type": ["object", "null"]},
+        "heading_styles": {"type": "array"},
+        "uses_native_numbering": {"type": "boolean"},
+        "manual_page_numbers_in_footer": {"type": "boolean"}
+      }
+    },
+    "issues": {
+      "type": "array",
+      "description": "分析时发现的可疑排版问题",
+      "items": {"type": "string"}
+    }
+  }
+}

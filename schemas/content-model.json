@@ -1,0 +1,113 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "content-model.json",
+  "title": "Content Model",
+  "description": "generate_docx.py --content 的输入:与格式分离的内容块序列。agent 负责内容,脚本负责格式。",
+  "type": "object",
+  "required": ["blocks"],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "properties": {
+        "title": {"type": "string"},
+        "language": {"type": "string"},
+        "source_template": {"type": "string"}
+      }
+    },
+    "blocks": {
+      "type": "array",
+      "items": {"$ref": "#/definitions/block"}
+    }
+  },
+  "definitions": {
+    "anchor": {
+      "description": "可选。标题锚点文本(写模板标题原文,脚本对编号/空格做宽容匹配);带锚点的块插入到该标题之后,不带则追加文末。",
+      "type": "string"
+    },
+    "block": {
+      "type": "object",
+      "required": ["type"],
+      "oneOf": [
+        {
+          "properties": {
+            "type": {"const": "cover"},
+            "fields": {
+              "type": "object",
+              "description": "占位符字段 -> 值。支持 {{key}}、【key】、'标签:____' 三类占位符。",
+              "additionalProperties": {"type": "string"}
+            }
+          }
+        },
+        {
+          "properties": {
+            "type": {"const": "heading"},
+            "level": {"type": "integer", "minimum": 1, "maximum": 9},
+            "text": {"type": "string"},
+            "numbering": {
+              "description": "native=模板该级标题有原生编号,脚本会剥离 text 中手写的编号前缀;缺省=按 text 原样输出",
+              "type": "string", "enum": ["native"]
+            },
+            "after": {"$ref": "#/definitions/anchor"}
+          }
+        },
+        {
+          "properties": {
+            "type": {"const": "paragraph"},
+            "text": {"type": "string"},
+            "after": {"$ref": "#/definitions/anchor"}
+          }
+        },
+        {
+          "properties": {
+            "type": {"const": "table"},
+            "rows": {
+              "type": "array",
+              "items": {"type": "array", "items": {"type": "string"}},
+              "description": "二维文本;第一行为表头(header_row=true 时加粗居中)"
+            },
+            "header_row": {"type": "boolean", "default": true},
+            "caption": {"type": "string", "description": "题注文本,渲染在表格后"},
+            "style": {"type": "string", "description": "表格样式名或 styleId;缺省用文档最常用表格样式,再缺省画网格线"},
+            "widths_cm": {"type": "array", "items": {"type": "number"}},
+            "after": {"$ref": "#/definitions/anchor"}
+          }
+        },
+        {
+          "properties": {
+            "type": {"const": "table_fill"},
+            "table_index": {"type": "integer", "description": "原模板表格序号(analyze spec 的 tables[].index);fill/insert 模式有效"},
+            "cells": {
+              "type": "object",
+              "description": "键为 '行,列'(0 起),值为要写入的文本",
+              "additionalProperties": {"type": "string"},
+              "propertyNames": {"pattern": "^\\d+,\\d+$"}
+            },
+            "after": {"$ref": "#/definitions/anchor"}
+          }
+        },
+        {
+          "properties": {
+            "type": {"const": "image"},
+            "path": {"type": "string", "description": "图片路径(相对运行目录或绝对)"},
+            "width_cm": {"type": "number", "description": "只设宽度保纵横比;缺省用原始尺寸"},
+            "caption": {"type": "string"},
+            "after": {"$ref": "#/definitions/anchor"}
+          }
+        },
+        {
+          "properties": {
+            "type": {"const": "caption"},
+            "text": {"type": "string"},
+            "after": {"$ref": "#/definitions/anchor"}
+          }
+        },
+        {
+          "properties": {
+            "type": {"const": "page_break"},
+            "after": {"$ref": "#/definitions/anchor"}
+          }
+        }
+      ]
+    }
+  }
+}
