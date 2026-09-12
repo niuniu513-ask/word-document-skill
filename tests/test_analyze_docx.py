@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Unit tests for analyze_docx.py."""
 from __future__ import annotations
 
@@ -84,3 +83,31 @@ class TestAnalyzeDocx:
         assert "font_combinations" in inv
         assert "colors" in inv
         assert inv["run_count"] > 0
+
+    def test_analyze_detects_explicit_and_theme_colors(self, tmp_path):
+        from analyze_docx import main as analyze_main
+        from docx import Document
+        from docx.oxml import OxmlElement
+        from docx.oxml.ns import qn
+        from docx.shared import RGBColor
+
+        doc = Document()
+        p = doc.add_paragraph()
+        p.add_run("red").font.color.rgb = RGBColor(0xC0, 0x00, 0x00)
+        themed = p.add_run("theme")
+        rpr = themed._r.get_or_add_rPr()
+        color = OxmlElement("w:color")
+        color.set(qn("w:val"), "4472C4")
+        color.set(qn("w:themeColor"), "accent1")
+        color.set(qn("w:themeShade"), "80")
+        rpr.append(color)
+        source = tmp_path / "font-colors.docx"
+        doc.save(str(source))
+
+        out = tmp_path / "spec.json"
+        sys.argv = ["analyze_docx.py", str(source), "-o", str(out)]
+        assert analyze_main() == 0
+        spec = json.loads(out.read_text(encoding="utf-8"))
+        colors = {item["color"] for item in spec["formatting_inventory"]["colors"]}
+        assert "C00000" in colors
+        assert "theme:accent1;shade:80;fallback:4472C4" in colors

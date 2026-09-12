@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Generate a .docx INSIDE an existing format system (template or format spec).
 
 Two modes:
@@ -33,7 +32,12 @@ from docx.shared import Cm, Pt
 
 sys.path.insert(0, str(Path(__file__).parent))
 from _docx_utils import (  # noqa: E402
-    all_, body_blocks, dump_json, first, setup_stdout, style_paragraph,
+    all_,
+    body_blocks,
+    dump_json,
+    first,
+    setup_stdout,
+    style_paragraph,
 )
 
 HEADING_NAME_RE = re.compile(r"^(heading|标题)\s*(\d)", re.I)
@@ -129,7 +133,7 @@ def replace_token_in_runs(p, token: str, value: str) -> bool:
     end = idx + len(token)
     pos = 0
     touched = []
-    for r, txt in zip(runs, texts):
+    for r, txt in zip(runs, texts, strict=True):
         rs, re_ = pos, pos + len(txt)
         pos = re_
         if re_ <= idx or rs >= end:
@@ -143,7 +147,7 @@ def replace_token_in_runs(p, token: str, value: str) -> bool:
     suffix = last_txt[end - touched[-1][2]:]
     newtext = prefix + value + suffix
     # clear all w:t in touched runs, then write newtext into first
-    for i, (r, txt, rs, re_) in enumerate(touched):
+    for i, (r, _txt, _rs, _re) in enumerate(touched):
         for t in r.findall(qn("w:t")):
             r.remove(t)
         if i == 0:
@@ -182,7 +186,7 @@ def fill_placeholders(doc, fields: dict) -> tuple[int, list[str]]:
                 text = para_full_text(p)
                 pat = re.compile(rf"({_key_body_pattern(key)}\s*[:：]?\s*)[_＿]{{2,}}")
                 if pat.search(text):
-                    new_full = pat.sub(lambda m: m.group(1) + v, text)
+                    new_full = pat.sub(lambda m, value=v: m.group(1) + value, text)
                     # keep first run formatting, wipe the rest
                     runs = list(p._p.iter(qn("w:r")))
                     for i, r in enumerate(runs):

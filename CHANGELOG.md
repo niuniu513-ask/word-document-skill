@@ -5,6 +5,17 @@ All notable changes to **word-document-skill** are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-09-12
+
+### Added
+- 识别运行与样式中的 Word 主题字体引用（ASCII、东亚、西文、复杂文字四轨）。
+- 识别主题字色的 tint、shade 和备用 RGB，避免把主题色误报为普通 RGB。
+- 增加显式 RGB、主题色和主题字体元数据的自动回归测试。
+
+### Changed
+- 清理全部 Ruff 静态检查问题，并将 GitHub Actions 的 Ruff 检查改为强制通过。
+- 修正 README 的 CI 仓库地址与测试数量。
+
 ## [1.0.1] - 2026-09-07
 
 ### Fixed

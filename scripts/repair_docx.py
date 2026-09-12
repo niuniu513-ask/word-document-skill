@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Detect and repair common layout problems in a .docx.
 
 Dry-run by default; pass --apply to write the fixed file (-o out.docx or --in-place).
@@ -26,8 +25,14 @@ from docx.text.paragraph import Paragraph
 
 sys.path.insert(0, str(Path(__file__).parent))
 from _docx_utils import (  # noqa: E402
-    all_, body_blocks, dump_json, first, is_empty_para, iter_all,
-    setup_stdout, style_paragraph,
+    all_,
+    body_blocks,
+    dump_json,
+    first,
+    is_empty_para,
+    iter_all,
+    setup_stdout,
+    style_paragraph,
 )
 from docx import Document  # noqa: E402
 
@@ -112,8 +117,9 @@ def fix_image_aspect(doc) -> list[str]:
     log = []
     fixed = 0
     try:
-        from PIL import Image
         import io
+
+        from PIL import Image
     except ImportError:
         return ["image-aspect: PIL unavailable, skipped"]
     for drawing in iter_all(doc.element.body, qn("w:drawing")):

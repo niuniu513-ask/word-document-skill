@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Analyze a .docx and emit a Document Specification (JSON).
 
 This is the "understand Word first" step of the skill. Run it on EVERY docx
@@ -22,11 +21,25 @@ from docx.oxml.ns import qn
 
 sys.path.insert(0, str(Path(__file__).parent))
 from _docx_utils import (  # noqa: E402
-    all_, body_blocks, doc_defaults, emu_to_cm, first, is_empty_para,
-    iter_all, jd, package_flags, para_fields, para_first_run_font,
-    para_numpr, load_numbering, numbering_counters, dump_json,
-    setup_stdout, style_font, style_paragraph, twips_to_cm, twips_to_pt,
+    all_,
+    body_blocks,
+    doc_defaults,
+    dump_json,
+    emu_to_cm,
+    first,
+    is_empty_para,
+    iter_all,
+    load_numbering,
+    numbering_counters,
+    package_flags,
+    para_fields,
+    para_first_run_font,
+    para_numpr,
     run_font,
+    setup_stdout,
+    style_font,
+    style_paragraph,
+    twips_to_cm,
 )
 from docx import Document  # noqa: E402
 
@@ -106,8 +119,9 @@ def collect_images(doc, blocks) -> list[dict]:
             return media_cache[rid]
         try:
             part = doc.part.rels[rid].target_part
-            from PIL import Image
             import io
+
+            from PIL import Image
             img = Image.open(io.BytesIO(part.blob))
             res = (img.width, img.height)
         except Exception:
@@ -139,14 +153,14 @@ def collect_images(doc, blocks) -> list[dict]:
                     disp_ar = entry["width_cm"] / entry["height_cm"]
                     entry["distorted"] = abs(native_ar - disp_ar) / native_ar > 0.02
             images.append(entry)
-        for pict in all_(p_el, qn("w:pict")):
+        for _pict in all_(p_el, qn("w:pict")):
             images.append({
                 "index": len(images), "type": "legacy-vml", "paragraph_index": b["index"],
                 "width_cm": None, "height_cm": None, "native_px": None,
                 "distorted": None, "caption_guess": None,
             })
     # caption guess: next non-empty paragraph "图N ..." / "Fig" / caption style
-    for i, img in enumerate(images):
+    for img in images:
         for j in range(img["paragraph_index"] + 1, len(blocks)):
             if blocks[j]["kind"] == "p" and not is_empty_para(blocks[j]["p"]):
                 nxt = blocks[j]["p"]
@@ -234,7 +248,12 @@ def detect_toc(doc, blocks, styles_by_id) -> dict:
     return {"present": present, "detected_via": sorted(set(via)), "entries_preview": entries[:8]}
 
 
-FONT_KEYS = ("ascii", "eastAsia", "hAnsi", "cs", "size_pt", "bold", "italic", "underline", "color", "color_theme")
+FONT_KEYS = (
+    "ascii", "eastAsia", "hAnsi", "cs",
+    "ascii_theme", "eastAsia_theme", "hAnsi_theme", "cs_theme",
+    "size_pt", "bold", "italic", "underline",
+    "color", "color_theme", "color_theme_tint", "color_theme_shade",
+)
 
 
 def effective_run_font(p, run_el) -> dict:
@@ -293,10 +312,23 @@ def font_inventory(doc) -> dict:
             font_key = {
                 "ascii": profile.get("ascii"), "eastAsia": profile.get("eastAsia"),
                 "hAnsi": profile.get("hAnsi"), "cs": profile.get("cs"),
+                "ascii_theme": profile.get("ascii_theme"),
+                "eastAsia_theme": profile.get("eastAsia_theme"),
+                "hAnsi_theme": profile.get("hAnsi_theme"),
+                "cs_theme": profile.get("cs_theme"),
                 "size_pt": profile.get("size_pt"),
             }
             font_counts[tuple(font_key.items())] += 1
-            color = profile.get("color") or (f"theme:{profile['color_theme']}" if profile.get("color_theme") else "auto/default")
+            if profile.get("color_theme"):
+                color = f"theme:{profile['color_theme']}"
+                if profile.get("color_theme_tint"):
+                    color += f";tint:{profile['color_theme_tint']}"
+                if profile.get("color_theme_shade"):
+                    color += f";shade:{profile['color_theme_shade']}"
+                if profile.get("color") and profile["color"].lower() != "auto":
+                    color += f";fallback:{profile['color']}"
+            else:
+                color = profile.get("color") or "auto/default"
             color_counts[color] += 1
             examples.setdefault(key, {"text": text[:40], "location": location})
 
@@ -313,7 +345,7 @@ def font_inventory(doc) -> dict:
     dominant = None
     if profiles:
         key, count = profiles.most_common(1)[0]
-        dominant = {k: v for k, v in zip(FONT_KEYS, key)}
+        dominant = {k: v for k, v in zip(FONT_KEYS, key, strict=True)}
         dominant["run_count"] = count
         dominant["example"] = examples.get(key)
     return {
@@ -385,8 +417,6 @@ def main() -> int:
     max_empty_streak = 0
     empty_runs_ge3 = 0
     body_style_counts: collections.Counter = collections.Counter()
-    prev_heading = None
-
     for b in blocks:
         if b["kind"] != "p":
             continue
@@ -513,7 +543,7 @@ def main() -> int:
     # manual page number in footers?
     manual_pagenum = False
     for s in sections:
-        for k, v in s["footers"].items():
+        for _k, v in s["footers"].items():
             for para in v.get("content", []):
                 if re.fullmatch(r"\d+", para["text"]) and not para["fields"]:
                     manual_pagenum = True

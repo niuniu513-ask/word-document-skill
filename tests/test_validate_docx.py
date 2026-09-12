@@ -1,12 +1,9 @@
-# -*- coding: utf-8 -*-
 """Unit tests for validate_docx.py."""
 from __future__ import annotations
 
 import json
 import sys
 from pathlib import Path
-
-import pytest
 
 SKILL_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(SKILL_ROOT / "scripts"))
@@ -36,8 +33,9 @@ class TestValidateDocx:
         assert len(empty_issues) >= 1
 
     def test_delta_identical_documents(self, simple_docx, tmp_path):
-        from validate_docx import main as val_main
         import shutil
+
+        from validate_docx import main as val_main
         copy = tmp_path / "copy.docx"
         shutil.copy2(simple_docx, copy)
         out = tmp_path / "delta.json"
@@ -55,8 +53,9 @@ class TestValidateDocx:
         assert rc == 2
 
     def test_delta_detects_table_count_change(self, simple_docx, tmp_path):
-        from docx import Document
         import shutil
+
+        from docx import Document
         # Create a modified copy with an extra table
         copy = tmp_path / "modified.docx"
         shutil.copy2(simple_docx, copy)

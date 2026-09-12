@@ -32,7 +32,7 @@ python <skill>/scripts/extract_content.py <input.docx> -o content.json --markdow
 - **准备重建/迁移格式** → `sections`(页面与页边距)、`doc_defaults` + `conventions.body_style`(默认字体三轨道)、`conventions.heading_styles`(各级标题样式与编号)、`styles`(全部样式定义,注意 based_on 链)。
 - **准备编辑现有文档** → `document.package_flags`(有没有修订/批注/文本框——有修订要先问用户要不要保留修订痕迹)、`outline` + `paragraphs_preview`(定位要改的段落)、`issues`(顺手要报告的问题)。
 - **准备修排版** → 直接看 `issues`,再配合 `--check` 模式的 validate_docx.py。
-- **识别字体与字色** → 看 `styles[].font` 获取样式继承后的字体、字号、粗斜体和显式颜色；看 `paragraphs_preview[].run_font` 获取段落首个实际文字运行；看 `formatting_inventory` 获取正文、表格、页眉页脚中实际使用格式的频次、主要组合和颜色清单。颜色可能是 RGB（如 `365F91`）、`auto/default` 或 `theme:accent1` 等主题色。
+- **识别字体与字色** → 看 `styles[].font` 获取样式继承后的字体、主题字体引用、字号、粗斜体和颜色；看 `paragraphs_preview[].run_font` 获取段落首个实际文字运行；看 `formatting_inventory` 获取正文、表格、页眉页脚中实际使用格式的频次、主要组合和颜色清单。颜色可能是 RGB（如 `365F91`）、`auto/default`，或带 tint/shade 与备用 RGB 的 `theme:accent1;...`。主题字体记录在 `ascii_theme/eastAsia_theme/hAnsi_theme/cs_theme`，不得因没有显式字体名就误判为“未设置字体”。
 
 字体识别必须区分 `eastAsia`（中文）、`ascii/hAnsi`（西文与数字）和 `cs`（复杂文字）三个轨道。迁移或生成时，优先沿用 `formatting_inventory.dominant` 与对应样式，而不是把所有文字强行设成一种字体；如果 `mixed_fonts` 或 `mixed_colors` 为 `true`，说明模板存在多种真实格式，需按样式/段落角色分别保留。
 

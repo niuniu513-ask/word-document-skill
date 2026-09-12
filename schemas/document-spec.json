@@ -103,12 +103,18 @@
               "ascii": {"type": ["string", "null"]},
               "eastAsia": {"type": ["string", "null"]},
               "hAnsi": {"type": ["string", "null"]},
+              "ascii_theme": {"type": ["string", "null"]},
+              "eastAsia_theme": {"type": ["string", "null"]},
+              "hAnsi_theme": {"type": ["string", "null"]},
+              "cs_theme": {"type": ["string", "null"]},
               "size_pt": {"type": ["number", "null"]},
               "bold": {"type": ["boolean", "null"]},
               "italic": {"type": ["boolean", "null"]},
               "underline": {"type": ["boolean", "null"]},
               "color": {"type": ["string", "null"]},
-              "color_theme": {"type": ["string", "null"], "description": "主题色名称；显式RGB色优先看color"}
+              "color_theme": {"type": ["string", "null"], "description": "主题色名称"},
+              "color_theme_tint": {"type": ["string", "null"]},
+              "color_theme_shade": {"type": ["string", "null"]}
             }
           },
           "paragraph": {

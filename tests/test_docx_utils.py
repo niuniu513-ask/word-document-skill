@@ -1,18 +1,24 @@
-# -*- coding: utf-8 -*-
 """Unit tests for _docx_utils.py shared helpers."""
 from __future__ import annotations
 
 import sys
 from pathlib import Path
 
-import pytest
-
 SKILL_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(SKILL_ROOT / "scripts"))
 
 from _docx_utils import (  # noqa: E402
-    _fmt_num, _int_to_cn, body_blocks, emu_to_cm, first,
-    half_pt_to_pt, is_empty_para, jd, style_chain, twips_to_cm,
+    _fmt_num,
+    _int_to_cn,
+    body_blocks,
+    emu_to_cm,
+    first,
+    half_pt_to_pt,
+    is_empty_para,
+    jd,
+    run_font,
+    style_chain,
+    twips_to_cm,
     twips_to_pt,
 )
 
@@ -139,3 +145,30 @@ class TestStyleChain:
         chain = list(style_chain(normal))
         assert len(chain) >= 1
         assert chain[0] == normal
+
+
+class TestRunFont:
+    def test_theme_font_and_color_metadata(self):
+        from docx import Document
+        from docx.oxml import OxmlElement
+        from docx.oxml.ns import qn
+
+        doc = Document()
+        run = doc.add_paragraph().add_run("Theme formatted")
+        rpr = run._r.get_or_add_rPr()
+        fonts = OxmlElement("w:rFonts")
+        fonts.set(qn("w:asciiTheme"), "minorHAnsi")
+        fonts.set(qn("w:eastAsiaTheme"), "majorEastAsia")
+        rpr.append(fonts)
+        color = OxmlElement("w:color")
+        color.set(qn("w:val"), "4472C4")
+        color.set(qn("w:themeColor"), "accent1")
+        color.set(qn("w:themeTint"), "99")
+        rpr.append(color)
+
+        detected = run_font(run._r)
+        assert detected["ascii_theme"] == "minorHAnsi"
+        assert detected["eastAsia_theme"] == "majorEastAsia"
+        assert detected["color"] == "4472C4"
+        assert detected["color_theme"] == "accent1"
+        assert detected["color_theme_tint"] == "99"

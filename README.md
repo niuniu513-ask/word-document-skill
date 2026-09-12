@@ -2,10 +2,10 @@
 
 > **Word Document Intelligence** — 先理解任何 .docx 的结构与格式，再在原有格式体系内完成生成、修改、填充、排版、迁移与批量处理。
 
-[![CI](https://github.com/your-org/word-document-skill/actions/workflows/ci.yml/badge.svg)](https://github.com/your-org/word-document-skill/actions/workflows/ci.yml)
+[![CI](https://github.com/niuniu513-ask/word-document-skill/actions/workflows/ci.yml/badge.svg)](https://github.com/niuniu513-ask/word-document-skill/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Tests](https://img.shields.io/badge/tests-44%20passed-brightgreen)]()
+[![Tests](https://img.shields.io/badge/tests-47%20passed-brightgreen)]()
 
 核心理念：**先理解 Word，再操作 Word。不是"套模板"，而是"理解文档"。**
 
@@ -51,13 +51,15 @@
 
 | 能力 | 脚本 | 说明 |
 |---|---|---|
-| 文档分析 | `analyze_docx.py` | 完整 Document Specification：页面、样式、大纲、表格、图片、页眉页脚、封面/目录检测、格式清单、问题列表 |
+| 文档分析 | `analyze_docx.py` | 完整 Document Specification：页面、样式、大纲、表格、图片、页眉页脚、封面/目录检测、显式/主题字体与 RGB/主题字色清单、问题列表 |
 | 内容提取 | `extract_content.py` | 结构化 content-model JSON + Markdown 视图 |
 | 样式详查 | `inspect_styles.py` | basedOn 链全量样式报告 |
 | 文档生成 | `generate_docx.py` | 三模式：insert（锚点插入，最安全）/ fill（仅占位符）/ rebuild（保留封面重建正文） |
 | 格式验证 | `validate_docx.py` | Format Delta（原文档 vs 产出）+ 结构体检 |
 | 视觉渲染 | `render_docx.py` | Word COM（最忠实）→ LibreOffice 兜底；PDF + 逐页 PNG |
 | 自动修复 | `repair_docx.py` | 空段落/标题keepNext/图片比例/手打页码/假标题；默认 dry-run |
+
+字体分析区分中文、西文/数字和复杂文字轨道，并保留 Word 主题字体引用；字色分析区分显式 RGB、自动色和主题色，同时记录 tint、shade 与备用 RGB，便于精确复刻模板。
 
 ## 安装
 

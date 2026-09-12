@@ -1,12 +1,8 @@
-# -*- coding: utf-8 -*-
 """Unit tests for repair_docx.py."""
 from __future__ import annotations
 
-import json
 import sys
 from pathlib import Path
-
-import pytest
 
 SKILL_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(SKILL_ROOT / "scripts"))
@@ -14,8 +10,8 @@ sys.path.insert(0, str(SKILL_ROOT / "scripts"))
 
 class TestRepairDocx:
     def test_dry_run_does_not_modify(self, empty_paragraphs_docx, tmp_path):
+
         from repair_docx import main as repair_main
-        import shutil
         original_size = empty_paragraphs_docx.stat().st_size
         sys.argv = ["repair_docx.py", str(empty_paragraphs_docx),
                     "--fix", "empty-paragraphs"]

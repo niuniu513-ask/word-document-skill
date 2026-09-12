@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Shared pytest fixtures for word-document-skill tests."""
 from __future__ import annotations
 
@@ -22,11 +21,10 @@ def tmp_docx(tmp_path):
 def simple_docx(tmp_path):
     """Create a simple docx with headings, paragraphs, and a table."""
     from docx import Document
-    from docx.shared import Pt
 
     doc = Document()
     # Title
-    title = doc.add_heading("测试文档", level=1)
+    doc.add_heading("测试文档", level=1)
     # Body paragraph
     p = doc.add_paragraph("这是第一段正文内容，用于测试。")
     p.style = doc.styles["Normal"]

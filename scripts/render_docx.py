@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Render a .docx to PDF and per-page PNGs for visual QA.
 
 Backends (auto): MS Word COM (most faithful, Windows) -> LibreOffice soffice.
@@ -10,8 +9,6 @@ Usage:
 from __future__ import annotations
 
 import argparse
-import json
-import os
 import subprocess
 import sys
 import time

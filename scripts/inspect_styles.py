@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Dump a detailed, human-readable style report for a .docx.
 
 Use when analyze_docx.py's style list is not enough and you need the full

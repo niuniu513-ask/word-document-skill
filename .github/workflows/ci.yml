@@ -29,7 +29,6 @@ jobs:
 
       - name: Lint with ruff
         run: ruff check scripts/ tests/
-        continue-on-error: true
 
       - name: Run tests
         run: |

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Extract the CONTENT of a .docx into a structured content-model JSON.
 
 Content and formatting are separated: this script returns WHAT the document
@@ -19,8 +18,15 @@ from docx.oxml.ns import qn
 
 sys.path.insert(0, str(Path(__file__).parent))
 from _docx_utils import (  # noqa: E402
-    all_, body_blocks, dump_json, first, is_empty_para, iter_all,
-    load_numbering, numbering_counters, para_fields, para_numpr,
+    all_,
+    body_blocks,
+    dump_json,
+    first,
+    is_empty_para,
+    load_numbering,
+    numbering_counters,
+    para_fields,
+    para_numpr,
     setup_stdout,
 )
 from docx import Document  # noqa: E402

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Validate docx outputs.
 
 Mode 1 -- Format Delta (guard "only change what the user asked for"):
@@ -17,8 +16,15 @@ from docx.oxml.ns import qn
 
 sys.path.insert(0, str(Path(__file__).parent))
 from _docx_utils import (  # noqa: E402
-    all_, body_blocks, dump_json, first, is_empty_para, package_flags,
-    para_fields, setup_stdout, style_font, style_paragraph,
+    all_,
+    body_blocks,
+    dump_json,
+    first,
+    is_empty_para,
+    para_fields,
+    setup_stdout,
+    style_font,
+    style_paragraph,
 )
 from docx import Document  # noqa: E402
 
@@ -108,7 +114,7 @@ def compare_format(orig: Document, final: Document) -> dict:
     so, sf = section_fingerprint(orig), section_fingerprint(final)
     if len(so) != len(sf):
         diffs.append({"category": "sections", "what": f"节数 {len(so)} -> {len(sf)}"})
-    for i, (a, b) in enumerate(zip(so, sf)):
+    for i, (a, b) in enumerate(zip(so, sf, strict=False)):
         for key in ("page", "margins", "hf_dist"):
             if not near_all(a[key], b[key]):
                 diffs.append({"category": "sections", "what": f"节{i + 1} {key}: {a[key]} -> {b[key]}"})
@@ -116,7 +122,7 @@ def compare_format(orig: Document, final: Document) -> dict:
             diffs.append({"category": "sections", "what": f"节{i + 1} 首页不同设置改变"})
 
     ho, hf = header_footer_fingerprint(orig), header_footer_fingerprint(final)
-    for i, (a, b) in enumerate(zip(ho, hf)):
+    for i, (a, b) in enumerate(zip(ho, hf, strict=False)):
         if a != b:
             diffs.append({"category": "headers_footers",
                           "what": f"节{i + 1} 页眉/页脚内容改变: {a} -> {b}"})
@@ -141,7 +147,7 @@ def compare_format(orig: Document, final: Document) -> dict:
     to, tf = len(orig.tables), len(final.tables)
     if to != tf:
         diffs.append({"category": "tables", "what": f"表格数 {to} -> {tf}"})
-    for i, (a, b) in enumerate(zip(orig.tables, final.tables)):
+    for i, (a, b) in enumerate(zip(orig.tables, final.tables, strict=False)):
         try:
             if (len(a.rows), len(a.columns)) != (len(b.rows), len(b.columns)):
                 diffs.append({"category": "tables",
@@ -157,7 +163,7 @@ def compare_format(orig: Document, final: Document) -> dict:
 
 
 def near_all(a: tuple, b: tuple) -> bool:
-    return len(a) == len(b) and all(near(x, y) for x, y in zip(a, b))
+    return len(a) == len(b) and all(near(x, y) for x, y in zip(a, b, strict=True))
 
 
 def media_count(doc):
@@ -217,7 +223,7 @@ def check_document(doc) -> dict:
         except Exception:
             pass
     # tables wider than content area
-    for si, sec in enumerate(doc.sections):
+    for _si, sec in enumerate(doc.sections):
         content_w = (cm(sec.page_width) or 21) - (cm(sec.left_margin) or 3.18) - (cm(sec.right_margin) or 3.18)
         break
     else:

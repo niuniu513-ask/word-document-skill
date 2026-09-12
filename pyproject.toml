@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "word-document-skill"
-version = "1.0.1"
+version = "1.1.0"
 description = "Word Document Intelligence: analyze, generate, edit, and repair .docx files while preserving the original formatting system."
 readme = "README.md"
 license = {text = "MIT"}

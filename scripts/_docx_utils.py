@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Shared helpers for word-document-skill scripts.
 
 All scripts in this directory import from here. Keep this module dependency-light:
@@ -156,8 +155,11 @@ def style_font(style) -> dict:
     """Effective font resolved through the basedOn chain."""
     out = {
         "ascii": None, "eastAsia": None, "hAnsi": None, "cs": None,
+        "ascii_theme": None, "eastAsia_theme": None,
+        "hAnsi_theme": None, "cs_theme": None,
         "size_pt": None, "bold": None, "italic": None, "underline": None,
         "color": None, "color_theme": None,
+        "color_theme_tint": None, "color_theme_shade": None,
     }
     for st in style_chain(style):
         rpr = rpr_of_style(st)
@@ -168,6 +170,14 @@ def style_font(style) -> dict:
             for key in ("ascii", "eastAsia", "hAnsi", "cs"):
                 if out[key] is None:
                     out[key] = fonts.get(qn(f"w:{key}"))
+            for xml_key, out_key in (
+                ("asciiTheme", "ascii_theme"),
+                ("eastAsiaTheme", "eastAsia_theme"),
+                ("hAnsiTheme", "hAnsi_theme"),
+                ("csTheme", "cs_theme"),
+            ):
+                if out[out_key] is None:
+                    out[out_key] = fonts.get(qn(f"w:{xml_key}"))
         if out["size_pt"] is None:
             out["size_pt"] = half_pt_to_pt(first(rpr, qn("w:sz")).get(qn("w:val"))) if first(rpr, qn("w:sz")) is not None else None
         for key, tag in (("bold", "w:b"), ("italic", "w:i"), ("underline", "w:u")):
@@ -181,6 +191,8 @@ def style_font(style) -> dict:
             if cel is not None:
                 out["color"] = cel.get(qn("w:val"))
                 out["color_theme"] = cel.get(qn("w:themeColor"))
+                out["color_theme_tint"] = cel.get(qn("w:themeTint"))
+                out["color_theme_shade"] = cel.get(qn("w:themeShade"))
     return out
 
 
@@ -364,8 +376,11 @@ def run_font(run_el) -> dict:
     rpr = first(run_el, qn("w:rPr"))
     out = {
         "ascii": None, "eastAsia": None, "hAnsi": None, "cs": None,
+        "ascii_theme": None, "eastAsia_theme": None,
+        "hAnsi_theme": None, "cs_theme": None,
         "size_pt": None, "bold": None, "italic": None, "underline": None,
         "color": None, "color_theme": None,
+        "color_theme_tint": None, "color_theme_shade": None,
     }
     if rpr is None:
         return out
@@ -375,6 +390,10 @@ def run_font(run_el) -> dict:
         out["eastAsia"] = fonts.get(qn("w:eastAsia"))
         out["hAnsi"] = fonts.get(qn("w:hAnsi"))
         out["cs"] = fonts.get(qn("w:cs"))
+        out["ascii_theme"] = fonts.get(qn("w:asciiTheme"))
+        out["eastAsia_theme"] = fonts.get(qn("w:eastAsiaTheme"))
+        out["hAnsi_theme"] = fonts.get(qn("w:hAnsiTheme"))
+        out["cs_theme"] = fonts.get(qn("w:csTheme"))
     sz = first(rpr, qn("w:sz"))
     if sz is not None:
         out["size_pt"] = half_pt_to_pt(sz.get(qn("w:val")))
@@ -386,6 +405,8 @@ def run_font(run_el) -> dict:
     if color is not None:
         out["color"] = color.get(qn("w:val"))
         out["color_theme"] = color.get(qn("w:themeColor"))
+        out["color_theme_tint"] = color.get(qn("w:themeTint"))
+        out["color_theme_shade"] = color.get(qn("w:themeShade"))
     return out
 
 
