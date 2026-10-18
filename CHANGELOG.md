@@ -5,6 +5,21 @@ All notable changes to **word-document-skill** are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-10-18
+
+### Added
+- **Screenshot Evidence** (`references/screenshot-evidence.md`): what counts as a real screenshot, what is forbidden (synthetic editor UI, cross-run stitching, blank images for cells without output), Windows capture prerequisites (DPI awareness, detached launch), wheel direction, 2-D block-match stitching, per-cell cropping from single frames, tight-crop thresholds, `width_cm ≈ px × 0.0245` sizing so every screenshot keeps the same on-page character size, and the numeric checks that catch errors the eye misses.
+- **Lab report workflow** (`workflows/lab-report-screenshots.md`): eight-step pipeline from notebook execution to delivery, with acceptance criteria per step and a real baseline (37 pages / 74 images / 29 code labels / 27 result labels).
+- **Evidence Verifier** (`scripts/verify_evidence.py`): counts labels, pairs them with images, flags missing pairs, orphan images, blank images, wide black bars, over-tall images and aspect distortion; DOCX full check plus PDF count-only mode; `--expect LABEL=N` and `--strict` for gating.
+- **Window Capture** (`scripts/capture_notebook.py`): Windows scroll-capture with real wheel events, edge-based 2-D offset estimation, auto-stitch, alignment self-check and crop preview. Verified on VS Code 1.9x + Jupyter at 150% scaling.
+- 10 unit tests for the evidence verifier.
+
+### Changed
+- `SKILL.md`: routing row for screenshot-backed reports; Phase 4 now requires evidence reconciliation; five new high-frequency pitfalls.
+- `references/report-writing.md`: new section on per-question code/result screenshot structure.
+- `references/visual-qa.md`: screenshot-specific page checklist.
+- `README.md`: feature table, directory tree, test count, and an eighth prohibition (no fabricated screenshot evidence).
+
 ## [1.1.0] - 2026-09-12
 
 ### Added

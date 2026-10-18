@@ -1,6 +1,6 @@
 ---
 name: word-document-skill
-description: Word 智能文档处理技能:先完整分析任何 .docx 的结构、样式与格式并建立 Document Specification,再严格在原文档格式体系内完成生成、修改、填充、润色、排版修复、格式迁移与批量生成,最后经过格式验证、PDF 渲染逐页视觉检查与自动修复闭环再交付。凡任务涉及 Word 文档、docx、模板、实验报告、实习报告、课程设计、实践报告、课程作业、通知、总结、会议纪要、申请书、填表、排版、格式修复、按模板生成、内容迁移等场景,必须使用本 Skill——只要需要读取、创建、修改、填充或排版 Word 文件,即使用户没有明确提到"Word",也应触发本 Skill。
+description: Word 智能文档处理技能:先完整分析任何 .docx 的结构、样式与格式并建立 Document Specification,再严格在原文档格式体系内完成生成、修改、填充、润色、排版修复、格式迁移与批量生成,最后经过格式验证、PDF 渲染逐页视觉检查与自动修复闭环再交付。凡任务涉及 Word 文档、docx、模板、实验报告、实习报告、课程设计、实践报告、课程作业、通知、总结、会议纪要、申请书、填表、排版、格式修复、按模板生成、内容迁移等场景,必须使用本 Skill——只要需要读取、创建、修改、填充或排版 Word 文件,即使用户没有明确提到"Word",也应触发本 Skill。报告要求"真实代码截图/运行结果截图/VS Code 截图"时,同时按 workflows/lab-report-screenshots.md 采集并核对证据。
 compatibility: 需要 Python 3.10+;python-docx、lxml、Pillow 必装;渲染检查依赖 pywin32 + Microsoft Word(Windows)或 LibreOffice,以及 PyMuPDF
 ---
 
@@ -21,7 +21,7 @@ compatibility: 需要 Python 3.10+;python-docx、lxml、Pillow 必装;渲染检�
 5. 通用 Word 排版规范
 6. 你自己的推断
 
-**七条禁令:**
+**八条禁令:**
 
 - 禁止在未分析用户 Word 文档的情况下直接生成或重新设计文档。拿到 .docx,第一步永远是分析(见 Phase 1)。
 - 禁止因为"我觉得这样更好看"而改动用户原始格式。默认 **Formatting Delta ≈ 0**:只改变用户要求改变的东西。
@@ -30,6 +30,7 @@ compatibility: 需要 Python 3.10+;python-docx、lxml、Pillow 必装;渲染检�
 - 禁止把整篇文档设成一种字体。中文字体(eastAsia)、西文字体(ascii)、数字字体是三个轨道,必须分开处理。
 - 禁止破坏标题体系。原文档用"一、/(一)/1." 还是原生编号,就沿用哪套,不得强行改写编号体系。
 - 禁止擅自改写模板固定文本。封面标题、课程名、校名、固定说明、页眉页脚和既有章节标题默认受保护;只填明确占位符/字段/空白单元格或用户明确要求替换的内容。模板与源资料标题冲突时以模板为准,并在交付说明中提示。
+- 禁止伪造截图证据。用户要"真实的代码截图/运行结果截图"时,图必须来自真实运行的窗口;不许用代码绘制模拟界面、不许把两次运行的输出拼在一起(同一窗口连续滚动拼接除外)、不许给没有输出的单元格插空白图。文字结论里的数字必须能在同页截图中找到原值。
 - 禁止交付前不做验证。生成/修改后必须:格式验证 → 渲染成 PDF 逐页看 → 发现问题修复 → 再渲染,直到通过(最多 3 轮)。
 
 **内容与格式分离:** 文档 = Content(文字、数据、表格内容、图片)+ Formatting(页面、样式、字体、行距、页眉页脚、分页)。改内容不得动格式;改格式不得动内容。所有脚本都按此设计。
@@ -60,9 +61,11 @@ Phase 5  交付        最终 docx + 格式差异报告 + 待补充清单
 | 内容迁移 | "把这个文档的内容放进那个模板" | workflows/content-migration.md |
 | 排版修复 | "帮我把排版修好" | workflows/edit.md(修复模式)+ references/repair-rules.md |
 | 批量生成 | 一个模板 + 多份数据 | workflows/batch-generate.md |
+| 带截图的报告 | "要**真实代码截图**/运行结果截图/VS Code 截图" | workflows/lab-report-screenshots.md |
 | 仅分析 | "这个文档是什么结构/格式" | workflows/analyze.md |
 
 报告类文档(实验/实习/课程设计/实践报告)只是模板填充与新建文档的常见场景,默认结构见 references/report-writing.md;**用户模板有明确结构时,以模板为准**。
+截图证据的采集、裁切与比例换算是独立的一层,见 references/screenshot-evidence.md。
 
 ## 3. Phase 1 —— 文档分析(机制核心)
 
@@ -108,7 +111,7 @@ python <skill>/scripts/generate_docx.py --template 模板.docx --content content
 python <skill>/scripts/generate_docx.py --spec spec.json --content content.json -o 输出.docx
 ```
 
-深规则在 references/:样式与字体规则(word-style-rules.md)、模板与占位符细节(template-rules.md)、编辑保格式手法(document-editing.md)、报告结构默认值(report-writing.md)。
+深规则在 references/:样式与字体规则(word-style-rules.md)、模板与占位符细节(template-rules.md)、编辑保格式手法(document-editing.md)、报告结构默认值(report-writing.md)、截图证据链(screenshot-evidence.md)。
 
 ## 6. Phase 4 —— 验证闭环(不可跳过)
 
@@ -119,11 +122,14 @@ python <skill>/scripts/validate_docx.py --original 原文档.docx --final 输出
 python <skill>/scripts/validate_docx.py --check 输出.docx
 # 3) 渲染:Word COM(最忠实)→ LibreOffice 兜底;--update-fields 更新目录/页码域
 python <skill>/scripts/render_docx.py 输出.docx -o 渲染目录 --dpi 110 --update-fields
+# 4) 证据对账(含截图的文档必跑):标签数 / 图片数 / 空图 / 宽黑条 / 变形
+python <skill>/scripts/verify_evidence.py 输出.docx --label 代码截图 --label 实验结果截图 -o evidence.json
 ```
 
 然后用 Read 逐页查看渲染出的 page-XXX.png,按下表检查(完整版见 references/visual-qa.md):
 
 空白页/大面积空白 · 标题孤立页尾 · 图片变形 · 表格溢出版心或断裂异常 · 文字溢出 · 页眉页脚丢失 · 页码异常 · 边距异常 · 字体行距异常 · 目录页码错误。
+含截图的文档另查:标签下紧跟着图(不是错位)· 图里字与正文字号相当 · 输出图不是宽黑条或纯黑块 · 分析文字里的数字能在同页图中找到。
 
 发现问题 → references/repair-rules.md 选修法:
 
@@ -153,6 +159,8 @@ python <skill>/scripts/repair_docx.py 输出.docx --fix empty-paragraphs,heading
 | render_docx.py | docx→PDF→逐页 PNG | `-o 目录 --dpi 110 --update-fields --pages 1-5` |
 | validate_docx.py | 格式差异 + 结构体检 | `--original --final` 或 `--check` |
 | repair_docx.py | 自动修复(默认 dry-run) | `--fix a,b --apply -o` |
+| verify_evidence.py | 截图证据对账 | `--label 代码截图 --expect 代码截图=29 --strict` |
+| capture_notebook.py | 滚动窗口采集 + 拼接(Windows) | `--list-windows` / `--title` / `--stitch` |
 
 依赖:python-docx、lxml、Pillow 必需;PyMuPDF + (pywin32 或 LibreOffice)用于渲染。缺什么先 `pip install` 再继续;渲染后端不可用时,如实告知用户视觉检查受限,不得谎称已检查。
 
@@ -165,3 +173,8 @@ python <skill>/scripts/repair_docx.py 输出.docx --fix empty-paragraphs,heading
 - **忘了 --update-fields**——插入了正文却没更新目录页码,视觉检查时目录页码全是旧的。
 - **整篇换字体**——只允许在 style 层面改;eastAsia/ascii 分开设,禁止对 run 全量覆盖。
 - **渲染完不看图**——render 成功 ≠ 排版正确。必须逐页 Read PNG。
+- **截图全部撑满版心**——短图字大如标题、长图字小如注释。按 `width_cm ≈ px × 0.0245` 换算,让每张图的字符大小一致。
+- **从拼接长图切单元格**——接缝会把一行代码拦腰切断。在长图上定位,回**单帧原图**裁像素。
+- **给没输出的单元格插空图**——纯 `import`/赋值没有输出,应删掉该题的输出标签,而不是插一张黑图。
+- **分析里的数字凭记忆写**——`np.prod` 写成"累积乘积"、0.9981 其实是 0.7364。数字必须从输出复制。
+- **采集途中执行 cell**——输出块增减,行高模型全错。执行与采集必须分开。

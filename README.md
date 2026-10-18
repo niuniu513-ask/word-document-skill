@@ -5,7 +5,7 @@
 [![CI](https://github.com/niuniu513-ask/word-document-skill/actions/workflows/ci.yml/badge.svg)](https://github.com/niuniu513-ask/word-document-skill/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Tests](https://img.shields.io/badge/tests-47%20passed-brightgreen)]()
+[![Tests](https://img.shields.io/badge/tests-57%20passed-brightgreen)]()
 
 核心理念：**先理解 Word，再操作 Word。不是"套模板"，而是"理解文档"。**
 
@@ -31,16 +31,18 @@
 └──────────────────────┬──────────────────────────────┘
                        ↓
 ┌─────────────────────────────────────────────────────┐
-│  Phase 3  Execution (7 workflows)                    │
+│  Phase 3  Execution (8 workflows)                    │
 │  generate_docx.py: insert / fill / rebuild           │
 │  template-fill | generate | edit | format-migration  │
 │  content-migration | batch-generate | analyze        │
+│  lab-report-screenshots | capture_notebook.py        │
 └──────────────────────┬──────────────────────────────┘
                        ↓
 ┌─────────────────────────────────────────────────────┐
 │  Phase 4  Validation Loop (≤3 rounds)                │
 │  validate_docx.py: Format Delta + structural check   │
 │  render_docx.py: Word COM → PDF → per-page PNG       │
+│  verify_evidence.py: 截图标签/图片/空图/变形 对账      │
 │  repair_docx.py: auto-fix issues                     │
 └──────────────────────┬──────────────────────────────┘
                        ↓
@@ -58,6 +60,8 @@
 | 格式验证 | `validate_docx.py` | Format Delta（原文档 vs 产出）+ 结构体检 |
 | 视觉渲染 | `render_docx.py` | Word COM（最忠实）→ LibreOffice 兜底；PDF + 逐页 PNG |
 | 自动修复 | `repair_docx.py` | 空段落/标题keepNext/图片比例/手打页码/假标题；默认 dry-run |
+| 证据对账 | `verify_evidence.py` | 截图标签数、图片数、空图、宽黑条、图片变形与超高 |
+| 窗口采集 | `capture_notebook.py` | 真实前台滚动采集 + 二维模板匹配拼接（Windows） |
 
 字体分析区分中文、西文/数字和复杂文字轨道，并保留 Word 主题字体引用；字色分析区分显式 RGB、自动色和主题色，同时记录 tint、shade 与备用 RGB，便于精确复刻模板。
 
@@ -124,23 +128,25 @@ word-document-skill/
 ├── pyproject.toml           # 包配置 + 工具配置
 ├── requirements.txt         # 运行时依赖
 ├── requirements-dev.txt     # 开发依赖
-├── scripts/                 # 8 个可执行脚本 + 共享库
+├── scripts/                 # 10 个可执行脚本 + 共享库
 │   ├── _docx_utils.py       # 共享工具（XML解析、样式链、编号解析等）
 │   ├── analyze_docx.py      # 文档分析 → Document Specification
 │   ├── generate_docx.py     # 模板/spec 内生成
 │   ├── validate_docx.py     # 格式差异 + 结构体检
 │   ├── render_docx.py       # docx → PDF → 逐页 PNG
 │   ├── repair_docx.py       # 自动修复（dry-run 默认）
+│   ├── verify_evidence.py   # 截图证据对账（标签数/图片数/空图/宽黑条/变形）
+│   ├── capture_notebook.py  # 滚动窗口采集 + 拼接（Windows）
 │   ├── extract_content.py   # 内容提取 → content-model + Markdown
 │   └── inspect_styles.py    # 样式全量详查
 ├── schemas/                 # JSON Schema 定义
 │   ├── document-spec.json   # analyze 输出格式
 │   ├── content-model.json   # generate 输入格式
 │   └── task-model.json      # 任务识别模型
-├── workflows/               # 7 种任务类型的工作流指南
-├── references/              # 7 篇深度规则文档
+├── workflows/               # 8 种任务类型的工作流指南
+├── references/              # 8 篇深度规则文档
 ├── evals/                   # 集成测试用例（4 个场景）
-├── tests/                   # 单元测试（pytest，44 项）
+├── tests/                   # 单元测试（pytest，57 项）
 ├── examples/                # content.json 示例
 └── .github/                 # CI + Issue Templates
 ```
@@ -154,7 +160,7 @@ word-document-skill/
 5. **真实性** — 不虚构数据与经历；缺失标 `【待补充】`，模拟标 `【模拟数据】`。
 6. **验证闭环** — 格式验证 + 渲染逐页视觉检查 + 自动修复，交付前必过。
 
-## 七条禁令
+## 八条禁令
 
 1. 禁止在未分析用户 Word 文档的情况下直接生成或重新设计文档。
 2. 禁止因为"我觉得这样更好看"而改动用户原始格式。
@@ -162,7 +168,8 @@ word-document-skill/
 4. 禁止用空格、空回车、手打页码、手打编号模拟排版。
 5. 禁止把整篇文档设成一种字体（中/西/数字三轨道分开）。
 6. 禁止破坏标题体系。
-7. 禁止交付前不做验证。
+7. 禁止伪造截图证据（模拟界面、跨运行拼接、给无输出的单元格插空图）。
+8. 禁止交付前不做验证。
 
 ## 运行测试
 
