@@ -5,7 +5,7 @@
 [![CI](https://github.com/niuniu513-ask/word-document-skill/actions/workflows/ci.yml/badge.svg)](https://github.com/niuniu513-ask/word-document-skill/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Tests](https://img.shields.io/badge/tests-57%20passed-brightgreen)]()
+[![Tests](https://img.shields.io/badge/tests-68%20passed-brightgreen)]()
 
 核心理念：**先理解 Word，再操作 Word。不是"套模板"，而是"理解文档"。**
 
@@ -61,6 +61,7 @@
 | 视觉渲染 | `render_docx.py` | Word COM（最忠实）→ LibreOffice 兜底；PDF + 逐页 PNG |
 | 自动修复 | `repair_docx.py` | 空段落/标题keepNext/图片比例/手打页码/假标题；默认 dry-run |
 | 证据对账 | `verify_evidence.py` | 截图标签数、图片数、空图、宽黑条、图片变形与超高 |
+| 截图裁剪 | `crop_evidence.py` | 显式坐标比例、越界拒绝、PNG 保真与来源哈希；语义匹配另行核对 |
 | 窗口采集 | `capture_notebook.py` | 真实前台滚动采集 + 二维模板匹配拼接（Windows） |
 
 字体分析区分中文、西文/数字和复杂文字轨道，并保留 Word 主题字体引用；字色分析区分显式 RGB、自动色和主题色，同时记录 tint、shade 与备用 RGB，便于精确复刻模板。
@@ -128,7 +129,7 @@ word-document-skill/
 ├── pyproject.toml           # 包配置 + 工具配置
 ├── requirements.txt         # 运行时依赖
 ├── requirements-dev.txt     # 开发依赖
-├── scripts/                 # 10 个可执行脚本 + 共享库
+├── scripts/                 # 11 个可执行脚本 + 共享库
 │   ├── _docx_utils.py       # 共享工具（XML解析、样式链、编号解析等）
 │   ├── analyze_docx.py      # 文档分析 → Document Specification
 │   ├── generate_docx.py     # 模板/spec 内生成
@@ -146,7 +147,7 @@ word-document-skill/
 ├── workflows/               # 8 种任务类型的工作流指南
 ├── references/              # 8 篇深度规则文档
 ├── evals/                   # 集成测试用例（4 个场景）
-├── tests/                   # 单元测试（pytest，57 项）
+├── tests/                   # 单元测试（pytest，68 项）
 ├── examples/                # content.json 示例
 └── .github/                 # CI + Issue Templates
 ```
@@ -189,3 +190,5 @@ pytest tests/ -v
 ## 许可证
 
 [MIT](LICENSE) © word-document-skill contributors
+
+大框模板按 [模板大框与连续分页](references/template-frames.md) 处理：先看原模板视觉效果，再判断底层容器；不因单格表格而擅自按题拆行。截图缩放与裁剪映射见 [证据规则 §6.1](references/screenshot-evidence.md#61-缩放变化后的坐标与证据映射)。

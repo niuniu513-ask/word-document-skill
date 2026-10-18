@@ -10,6 +10,7 @@
    analyze_docx.py 资料.docx -o spec-资料.json      # 资料是 docx 时;纯文本/图片直接读
    extract_content.py 资料.docx -o content-资料.json --markdown 资料.md
    ```
+   同时渲染原模板首页及边框跨页位置,记录“大框/表格”的视觉用途;发现单格大容器或用户要求大框时,按 `references/template-frames.md` 处理。`.doc` 先用 Word/LibreOffice 转为 `.docx` 副本,不能直接交给 python-docx。
 2. **规划映射**:模板大纲(analyze 的 outline)是骨架;把资料内容分配到各标题下,产出 content.json:
    - 封面:cover.fields(analyze 报的占位符字段名)
    - 每节正文:{"type": "paragraph", "after": "<模板标题原文>", "text": "..."}

@@ -52,6 +52,7 @@ docx-extract = "scripts.extract_content:main"
 docx-inspect-styles = "scripts.inspect_styles:main"
 docx-verify-evidence = "scripts.verify_evidence:main"
 docx-capture = "scripts.capture_notebook:main"
+docx-crop-evidence = "scripts.crop_evidence:main"
 
 [tool.setuptools.packages.find]
 include = ["scripts*"]

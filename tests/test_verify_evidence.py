@@ -86,6 +86,21 @@ def test_label_without_image_is_error(tmp_path):
     assert any(f.code == "label_without_image" for f in rep.findings)
 
 
+@pytest.mark.parametrize("qualifier", ["（VS Code）", "(VS Code)", " （Jupyter） "])
+def test_editor_qualified_captions_pair_with_images(tmp_path, qualifier):
+    from verify_evidence import verify_docx
+
+    good = _text_like(tmp_path / "code.png")
+    doc = _build(tmp_path, [
+        (f"代码截图{qualifier}", good, 15.2, None),
+        (f"实验结果截图{qualifier}", good, 8.0, None),
+    ])
+    rep = verify_docx(doc, ["代码截图", "实验结果截图"], 0.35, 8.0)
+    assert rep.label_counts == {"代码截图": 1, "实验结果截图": 1}
+    assert all(i.label for i in rep.images)
+    assert not any(f.code == "orphan_image" for f in rep.findings)
+
+
 def test_orphan_image_reported_once(tmp_path):
     from verify_evidence import verify_docx
 

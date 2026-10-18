@@ -119,8 +119,8 @@ class Report:
 
 
 def _label_regex(label: str) -> re.Pattern:
-    # tolerate "代码截图：" / "代码截图:" / "代码截图 ：" and leading numbering
-    return re.compile(rf"{re.escape(label)}\s*[:：]")
+    # Editor qualifiers are part of captions, not a different evidence label.
+    return re.compile(rf"{re.escape(label)}\s*(?:[（(][^()（）\r\n]*[)）]\s*)?[:：]")
 
 
 def _measure(blob: bytes) -> tuple[int, int, float, float]:

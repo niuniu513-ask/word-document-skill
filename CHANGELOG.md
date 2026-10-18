@@ -5,6 +5,21 @@ All notable changes to **word-document-skill** are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- 大框模板识别与分页规则：分别记录视觉用途和 XML 容器，避免按题拆表造成布局偏离；明确用户要求无表格时的处理与验收。
+- `crop_evidence.py`：显式坐标变换、越界拒绝、无损裁剪及来源哈希旁车记录；不将几何检查当作 cell 语义验证。
+- 裁图像素保真、坐标越界和原屏保护回归测试。
+
+### Fixed
+- 补充框线坐标、段落边框外扩、封面下划线保留和逐页留白验收,区分压页数与真实排版改进。
+- 截图标签识别支持中英文括号的编辑器说明（如“代码截图（VS Code）：”）,避免误报大量孤立图片。
+- 修正截图工作流中直接解析 `.doc`、默认原地执行 notebook、强制改用户代码和删除原屏的指导。
+- 补充 keep-with-next 长链推空首页、长代码输出标签孤立、行单位段距残留、旧渲染页混入的排查。
+- 删除互相矛盾的历史数量基线；区分结构点数与截图内容匹配，明确重新裁图后需更新最终 DOCX。
+- 禁止涂抹证据图 UI；允许保留原屏后成对裁出代码与输出，区分实测数字与理论推导值。
+
 ## [1.2.0] - 2026-10-18
 
 ### Added
