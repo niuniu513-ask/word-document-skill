@@ -5,7 +5,7 @@
 [![CI](https://github.com/niuniu513-ask/word-document-skill/actions/workflows/ci.yml/badge.svg)](https://github.com/niuniu513-ask/word-document-skill/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Tests](https://img.shields.io/badge/tests-68%20passed-brightgreen)]()
+[![Tests](https://img.shields.io/badge/tests-73%20passed-brightgreen)]()
 
 核心理念：**先理解 Word，再操作 Word。不是"套模板"，而是"理解文档"。**
 
@@ -62,7 +62,9 @@
 | 自动修复 | `repair_docx.py` | 空段落/标题keepNext/图片比例/手打页码/假标题；默认 dry-run |
 | 证据对账 | `verify_evidence.py` | 截图标签数、图片数、空图、宽黑条、图片变形与超高 |
 | 截图裁剪 | `crop_evidence.py` | 显式坐标比例、越界拒绝、PNG 保真与来源哈希；语义匹配另行核对 |
-| 窗口采集 | `capture_notebook.py` | 真实前台滚动采集 + 二维模板匹配拼接（Windows） |
+| 离屏采集 | `render_nb_html.py` + `shoot_nb_cells.cjs` | notebook → HTML → 无头浏览器整页截图 + 逐 cell 精确裁剪；不占屏幕、无滚动推算（默认路线） |
+| 窗口采集 | `capture_notebook.py` | 真实前台滚动采集 + 二维模板匹配拼接（Windows，后备） |
+| 实验报告流水线 | `lab_report.py` | inventory / prepare / crop / contacts / build / audit / frames；配置驱动、显式映射、不猜题号 |
 
 字体分析区分中文、西文/数字和复杂文字轨道，并保留 Word 主题字体引用；字色分析区分显式 RGB、自动色和主题色，同时记录 tint、shade 与备用 RGB，便于精确复刻模板。
 
@@ -129,7 +131,7 @@ word-document-skill/
 ├── pyproject.toml           # 包配置 + 工具配置
 ├── requirements.txt         # 运行时依赖
 ├── requirements-dev.txt     # 开发依赖
-├── scripts/                 # 11 个可执行脚本 + 共享库
+├── scripts/                 # 16 个 Python 脚本 + 2 个 Node 采集脚本
 │   ├── _docx_utils.py       # 共享工具（XML解析、样式链、编号解析等）
 │   ├── analyze_docx.py      # 文档分析 → Document Specification
 │   ├── generate_docx.py     # 模板/spec 内生成
@@ -137,17 +139,24 @@ word-document-skill/
 │   ├── render_docx.py       # docx → PDF → 逐页 PNG
 │   ├── repair_docx.py       # 自动修复（dry-run 默认）
 │   ├── verify_evidence.py   # 截图证据对账（标签数/图片数/空图/宽黑条/变形）
-│   ├── capture_notebook.py  # 滚动窗口采集 + 拼接（Windows）
+│   ├── lab_report.py        # 实验报告主力：inventory / prepare / crop / contacts / build / audit / frames
+│   ├── render_nb_html.py    # notebook → 可截图 HTML（离屏渲染）
+│   ├── shoot_nb_cells.cjs   # 无头浏览器整页截图 + 逐 cell 精确裁剪
+│   ├── capture_vscode_cells.cjs # 真实 VS Code 窗口采集（CDP，仅明确要求 IDE 界面时）
+│   ├── capture_notebook.py  # 滚动窗口采集 + 拼接（Windows，后备）
+│   ├── crop_evidence.py     # 显式坐标裁图 + 哈希旁车记录
+│   ├── smoke_lab_standalone.py # 独立安装自检（不读任何课程资料）
 │   ├── extract_content.py   # 内容提取 → content-model + Markdown
 │   └── inspect_styles.py    # 样式全量详查
 ├── schemas/                 # JSON Schema 定义
 │   ├── document-spec.json   # analyze 输出格式
 │   ├── content-model.json   # generate 输入格式
 │   └── task-model.json      # 任务识别模型
-├── workflows/               # 8 种任务类型的工作流指南
-├── references/              # 8 篇深度规则文档
+├── workflows/               # 9 种任务类型的工作流指南
+├── references/              # 9 篇通用深度规则文档
+│   └── lab-report/          # 实验报告专用：配置字段、离屏采集、通用/本类/个案分档说明
 ├── evals/                   # 集成测试用例（4 个场景）
-├── tests/                   # 单元测试（pytest，68 项）
+├── tests/                   # 单元测试（pytest，73 项）
 ├── examples/                # content.json 示例
 └── .github/                 # CI + Issue Templates
 ```

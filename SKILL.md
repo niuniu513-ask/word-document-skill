@@ -1,6 +1,6 @@
 ---
 name: word-document-skill
-description: Word 智能文档处理技能:先完整分析任何 .docx 的结构、样式与格式并建立 Document Specification,再严格在原文档格式体系内完成生成、修改、填充、润色、排版修复、格式迁移与批量生成,最后经过格式验证、PDF 渲染逐页视觉检查与自动修复闭环再交付。凡任务涉及 Word 文档、docx、模板、实验报告、实习报告、课程设计、实践报告、课程作业、通知、总结、会议纪要、申请书、填表、排版、格式修复、按模板生成、内容迁移等场景,必须使用本 Skill——只要需要读取、创建、修改、填充或排版 Word 文件,即使用户没有明确提到"Word",也应触发本 Skill。报告要求"真实代码截图/运行结果截图/VS Code 截图"时,同时按 workflows/lab-report-screenshots.md 采集并核对证据。
+description: Word 智能文档处理技能:先完整分析任何 .docx 的结构、样式与格式并建立 Document Specification,再严格在原文档格式体系内完成生成、修改、填充、润色、排版修复、格式迁移与批量生成,最后经过格式验证、PDF 渲染逐页视觉检查与自动修复闭环再交付。凡任务涉及 Word 文档、docx、模板、实验报告、实习报告、课程设计、实践报告、课程作业、通知、总结、会议纪要、申请书、填表、排版、格式修复、按模板生成、内容迁移等场景,必须使用本 Skill——只要需要读取、创建、修改、填充或排版 Word 文件,即使用户没有明确提到"Word",也应触发本 Skill。报告要求"真实代码截图/运行结果截图/VS Code 截图"时,同时按 workflows/lab-report-runbook.md 采集并核对证据。
 metadata:
   compatibility: 需要 Python 3.10+;python-docx、lxml、Pillow 必装;渲染检查依赖 pywin32 + Microsoft Word(Windows)或 LibreOffice,以及 PyMuPDF
 ---
@@ -62,11 +62,14 @@ Phase 5  交付        最终 docx + 格式差异报告 + 待补充清单
 | 内容迁移 | "把这个文档的内容放进那个模板" | workflows/content-migration.md |
 | 排版修复 | "帮我把排版修好" | workflows/edit.md(修复模式)+ references/repair-rules.md |
 | 批量生成 | 一个模板 + 多份数据 | workflows/batch-generate.md |
-| 带截图的报告 | "要**真实代码截图**/运行结果截图/VS Code 截图" | workflows/lab-report-screenshots.md |
+| 带截图的报告 | "要**真实代码截图**/运行结果截图/实验报告" | workflows/lab-report-runbook.md(端到端) |
+| 只要 VS Code 界面截图 | 明确说"VS Code 窗口/IDE 界面" | runbook §3.2 + workflows/lab-report-screenshots.md(后备) |
 | 仅分析 | "这个文档是什么结构/格式" | workflows/analyze.md |
 
 报告类文档(实验/实习/课程设计/实践报告)只是模板填充与新建文档的常见场景,默认结构见 references/report-writing.md;**用户模板有明确结构时,以模板为准**。
 截图证据的采集、裁切与比例换算是独立的一层,见 references/screenshot-evidence.md。
+用户同时要求“严格原模板 / notebook / 真实运行截图”时，逐关执行 [可执行实验报告工作流](workflows/lab-report-runbook.md)：截图默认走 §3.1 **离屏渲染**（`scripts/render_nb_html.py` + `scripts/shoot_nb_cells.cjs`），只有明确要求 IDE 界面才走 §3.2 的 `scripts/capture_vscode_cells.cjs`；配置字段见 [实验报告配置](references/lab-report/lab-report-config.md)，构建与审计用 `scripts/lab_report.py`。原模板优先于历史成稿；保留原大框容器和固定章节，不额外增加目的、环境、总结。自动校验必须覆盖框内图片并传入预期数量；最后逐页检查标签与图片跨页情况。
+实验报告这一类任务的做法集中在 `references/lab-report/`（含“通用规则 / 本类方法 / 个案记录”的分档说明），不要把其中的个案数值当成通用常量。
 模板呈现为正文外大框、单格容器或用户纠正“不是表格”时,先读 [大框与分页规则](references/template-frames.md),分别记录视觉布局和底层 XML 结构,不要按题拆成多行表格。
 
 ## 3. Phase 1 —— 文档分析(机制核心)
@@ -113,7 +116,7 @@ python <skill>/scripts/generate_docx.py --template 模板.docx --content content
 python <skill>/scripts/generate_docx.py --spec spec.json --content content.json -o 输出.docx
 ```
 
-深规则在 references/:样式与字体规则(word-style-rules.md)、模板与占位符细节(template-rules.md)、编辑保格式手法(document-editing.md)、报告结构默认值(report-writing.md)、截图证据链(screenshot-evidence.md)。
+深规则在 references/:样式与字体规则(word-style-rules.md)、模板与占位符细节(template-rules.md)、编辑保格式手法(document-editing.md)、报告结构默认值(report-writing.md)、截图证据链(screenshot-evidence.md)。实验报告类任务另见 references/lab-report/(配置字段、离屏采集与分档说明)。
 
 ## 6. Phase 4 —— 验证闭环(不可跳过)
 

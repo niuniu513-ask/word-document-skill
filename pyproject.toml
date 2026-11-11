@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "word-document-skill"
-version = "1.2.0"
+version = "1.3.0"
 description = "Word Document Intelligence: analyze, generate, edit, and repair .docx files while preserving the original formatting system."
 readme = "README.md"
 license = {text = "MIT"}
@@ -33,6 +33,7 @@ dependencies = [
 
 [project.optional-dependencies]
 render = ["PyMuPDF>=1.23.0"]
+notebook = ["nbformat>=5.9", "nbclient>=0.9", "ipykernel>=6.0"]
 windows = ["pywin32>=306"]
 dev = [
     "pytest>=7.0",

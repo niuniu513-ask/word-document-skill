@@ -7,10 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-11-11
+
 ### Added
+- **离屏渲染采集**（`scripts/render_nb_html.py` + `scripts/shoot_nb_cells.cjs`）：notebook → 独立 HTML → 无头浏览器整页截图，再按 `.input` / `.output` / `.cell` 元素边界逐块裁剪。不占屏幕、无滚动推算、无哨兵行；实测 25 个 cell 一次跑完、零重试、约 40 秒，替代原先卡在大输出帧的 VS Code 路线。
+- **实验报告资料区** `references/lab-report/`：把实验报告类做法从通用 Word 规则里分出来，按"通用规则 / 本类方法 / 个案记录"三档标注适用范围，并附 `lab-report-config.md`（配置字段）与 `capture-offscreen.md`（离屏流程与字号换算）。
+- `scripts/lab_report.py`：`inventory` / `prepare` / `crop` / `contacts` / `build` / `audit` / `frames` 七个子命令；配置驱动、显式映射，不猜题号、不自动生成分析。
+- `image_mode: "joint"`：每个 cell 只插一张"代码+输出"连体图，标签可用 `joint_label` 覆盖；`audit` 的期望标签数随模式自动切换。
+- `audit` 支持离屏清单：清单没有 `evidence_notebook` 时，改用 `source` / `sourceFirstLine` 与 notebook 逐字对账，不再强制要求证据副本；指向错误 cell 会直接失败。
+- `tests/test_lab_report.py`：joint 模式插图与标签、离屏清单审计、错 cell 必须失败、裁图保真与校准比例。
+- `requirements-notebook.txt`（notebook 执行依赖）与 `scripts/smoke_lab_standalone.py`（独立安装自检，不读取任何课程资料）。
 - 大框模板识别与分页规则：分别记录视觉用途和 XML 容器，避免按题拆表造成布局偏离；明确用户要求无表格时的处理与验收。
 - `crop_evidence.py`：显式坐标变换、越界拒绝、无损裁剪及来源哈希旁车记录；不将几何检查当作 cell 语义验证。
 - 裁图像素保真、坐标越界和原屏保护回归测试。
+
+### Changed
+- `workflows/lab-report-runbook.md`：第 3 节拆成 **3.1 离屏渲染（默认）** 与 **3.2 VS Code 窗口（仅当明确要求 IDE 界面）**，并写明 VS Code 路线的实测代价与失效点（虚拟化列表、按 URI 恢复滚动位置、输出边界只能推算）。
+- `SKILL.md`：任务路由把"带截图的报告"指向 runbook，VS Code 采集降为备选；链接改指 `references/lab-report/`。
+- `README.md`：目录树、功能表与实际脚本对齐，测试数更新。
+- 新脚本统一通过 `ruff check`（CI 强制），`lab_report.py` / `render_nb_html.py` / 测试文件按同一风格格式化。
 
 ### Fixed
 - 补充框线坐标、段落边框外扩、封面下划线保留和逐页留白验收,区分压页数与真实排版改进。

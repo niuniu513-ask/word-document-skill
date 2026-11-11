@@ -18,7 +18,7 @@ SKILL_ROOT = Path(__file__).resolve().parent.parent
 
 INCLUDE_DIRS = ["scripts", "schemas", "workflows", "references", "evals", "examples"]
 INCLUDE_FILES = ["SKILL.md", "README.md", "LICENSE", "CHANGELOG.md",
-                 "requirements.txt", "pyproject.toml"]
+                 "requirements.txt", "requirements-notebook.txt", "pyproject.toml"]
 EXCLUDE_PATTERNS = ["__pycache__", ".pyc", ".pyo", ".pytest_cache", ".git",
                     ".DS_Store", "Thumbs.db", "*.skill"]
 

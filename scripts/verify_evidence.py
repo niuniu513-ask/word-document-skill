@@ -171,13 +171,9 @@ def _measure(blob: bytes) -> tuple[int, int, float, float]:
 
 
 def _walk_body(doc):
-    """Yield ('p', element) / ('tbl', element) in document order."""
-    body = doc.element.body
-    for child in body.iterchildren():
-        if child.tag == qn("w:p"):
-            yield "p", child
-        elif child.tag == qn("w:tbl"):
-            yield "tbl", child
+    """Walk XML once, including nested tables; merged cells are not duplicated."""
+    for paragraph in doc.element.body.iter(qn("w:p")):
+        yield "p", paragraph
 
 
 def _paragraph_images(p) -> list[tuple[str, float, float]]:

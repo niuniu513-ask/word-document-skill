@@ -8,3 +8,6 @@ PyMuPDF>=1.23.0
 
 # Windows-only rendering backend (install on Windows)
 # pywin32>=306 ; platform_system == "Windows"
+
+# Optional notebook report workflow (lab_report.py prepare/audit)
+# pip install nbformat nbclient ipykernel
