@@ -2,7 +2,6 @@
 
 import argparse
 
-import nbformat
 import pytest
 from docx import Document
 from docx.shared import Cm
@@ -10,6 +9,10 @@ from lab_report import audit, build, crop, digest, prepare, read, write
 from PIL import Image, ImageDraw
 from verify_evidence import main as verify_main
 from verify_evidence import verify_docx
+
+# The lab-report workflow needs nbformat; an install without the notebook extras
+# should skip these tests instead of failing collection.
+nbformat = pytest.importorskip("nbformat")
 
 
 def test_nested_frame_evidence_counted_once(tmp_path):

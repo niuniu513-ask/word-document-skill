@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- CI 的 `test` 作业自 v1.3.0 起在收集阶段失败（`ModuleNotFoundError: No module named 'nbformat'`）：改装修 `requirements-notebook.txt`，并让 `tests/test_lab_report.py` 在缺少 notebook 依赖时 skip 而不是中断收集。
+
+
 ## [1.3.0] - 2026-11-11
 
 ### Added
