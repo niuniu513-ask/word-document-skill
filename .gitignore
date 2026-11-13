@@ -45,11 +45,3 @@ page-*.png
 # Local config
 .env
 .env.local
-
-# MoonBit engine build artifacts (engine/ ships sources only)
-engine/_build/
-engine/.mooncakes/
-engine/out/
-engine/target/
-engine/**/pkg.generated.mbti
-.tmp/

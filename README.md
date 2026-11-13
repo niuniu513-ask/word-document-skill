@@ -49,41 +49,6 @@
               docx + 格式差异报告 + 待补充清单
 ```
 
-## 双实现：Python 与原生 MoonBit 引擎
-
-同一套"分析 → 编辑 → 校验"契约，仓库里有两个独立实现：
-
-| 实现 | 位置 | 角色 |
-| --- | --- | --- |
-| Python | `scripts/*.py` | 主力流程：生成、渲染、截图证据、实验报告流水线；依赖 `python-docx` / `lxml` |
-| MoonBit | `engine/` | 原生引擎：从 OOXML 层自己解析、自己写回，零原生依赖，可编译到 js / wasm-gc |
-
-`engine/` 是本期新增的引擎（约 4,600 行 MoonBit），覆盖同一组概念：命名空间感知的 XML
-解析与序列化、zip 包读写、`basedOn` 样式链、Document Specification 与规则引擎、
-**跨 run 字符级替换**、格式漂移校验。它有自己的 CLI 与测试：
-
-```bash
-cd engine
-moon test --target js                                   # 34 项测试
-moon run cmd/docx --target js -- analyze report.docx --out spec.json
-moon run cmd/docx --target js -- fill report.docx --set "【待补充】=已确认" --out filled.docx
-moon run cmd/docx --target js -- validate report.docx filled.docx
-```
-
-Python 侧通过 `scripts/mbt_engine.py` 调用它；没装 MoonBit 工具链时这些调用自动跳过，
-原有流程不受影响：
-
-```bash
-python scripts/mbt_engine.py doctor        # 工具链 + 引擎是否可用
-python scripts/mbt_engine.py analyze report.docx -o spec.json
-python scripts/mbt_engine.py fill report.docx --set "【待补充】=已确认" --out filled.docx
-python scripts/mbt_engine.py validate report.docx filled.docx
-```
-
-两套实现互相印证：在同一份样本报告上，Python `analyze_docx.py` 与 MoonBit `analyze` 得出的
-段落数（48）、表格数（9）、节数（1）、图片数（0）完全一致，"假标题"检测也都命中 2 处。
-两边是分别写的、没有共享代码，能对上本身就是正确性证据。
-
 ## 功能特性
 
 | 能力 | 脚本 | 说明 |
@@ -166,7 +131,7 @@ word-document-skill/
 ├── pyproject.toml           # 包配置 + 工具配置
 ├── requirements.txt         # 运行时依赖
 ├── requirements-dev.txt     # 开发依赖
-├── scripts/                 # 17 个 Python 脚本 + 2 个 Node 采集脚本
+├── scripts/                 # 16 个 Python 脚本 + 2 个 Node 采集脚本
 │   ├── _docx_utils.py       # 共享工具（XML解析、样式链、编号解析等）
 │   ├── analyze_docx.py      # 文档分析 → Document Specification
 │   ├── generate_docx.py     # 模板/spec 内生成
@@ -182,8 +147,7 @@ word-document-skill/
 │   ├── crop_evidence.py     # 显式坐标裁图 + 哈希旁车记录
 │   ├── smoke_lab_standalone.py # 独立安装自检（不读任何课程资料）
 │   ├── extract_content.py   # 内容提取 → content-model + Markdown
-│   ├── inspect_styles.py    # 样式全量详查
-│   └── mbt_engine.py        # 调用 engine/ 的桥接（无工具链时自动跳过）
+│   └── inspect_styles.py    # 样式全量详查
 ├── schemas/                 # JSON Schema 定义
 │   ├── document-spec.json   # analyze 输出格式
 │   ├── content-model.json   # generate 输入格式
@@ -192,8 +156,7 @@ word-document-skill/
 ├── references/              # 9 篇通用深度规则文档
 │   └── lab-report/          # 实验报告专用：配置字段、离屏采集、通用/本类/个案分档说明
 ├── evals/                   # 集成测试用例（4 个场景）
-├── engine/                  # 原生 MoonBit 引擎（约 4,600 行）：分析 / 编辑 / 校验
-├── tests/                   # 单元测试（pytest，77 项）
+├── tests/                   # 单元测试（pytest，73 项）
 ├── examples/                # content.json 示例
 └── .github/                 # CI + Issue Templates
 ```
