@@ -1,0 +1,8 @@
+import {
+  "moonbitlang/x/fs",
+  "moonbitlang/core/env",
+  "niuniu513/docx-mbt/docx",
+  "niuniu513/docx-mbt/ooxml",
+}
+
+pkgtype(kind: "executable")

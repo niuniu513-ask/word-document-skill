@@ -1,0 +1,40 @@
+name: ci
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install MoonBit
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
+          echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
+
+      - name: Toolchain version
+        run: moon version --all
+
+      - name: Update registry index
+        run: moon update
+
+      - name: Check
+        run: moon check --target js
+
+      - name: Test
+        run: moon test --target js
+
+      - name: CLI smoke test
+        run: |
+          moon run cmd/docx --target js -- info tests/fixtures/mini.docx
+          moon run cmd/docx --target js -- issues tests/fixtures/mini.docx
+          moon run cmd/docx --target js -- fill tests/fixtures/mini.docx \
+            --set "【待补充】=STC89C52" --out /tmp/filled.docx
+          moon run cmd/docx --target js -- validate tests/fixtures/mini.docx /tmp/filled.docx
+
+      - name: Demo
+        run: moon run examples/demo --target js

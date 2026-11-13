@@ -1,0 +1,6 @@
+import {
+  "moonbitlang/x/fs",
+  "moonbitlang/core/json",
+  "niuniu513/docx-mbt/ooxml",
+  "niuniu513/docx-mbt/xml",
+}

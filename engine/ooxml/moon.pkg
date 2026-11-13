@@ -1,0 +1,7 @@
+import {
+  "moonbitlang/core/archive/zip",
+  "moonbitlang/core/encoding/utf8",
+  "niuniu513/docx-mbt/xml",
+}
+
+options("allow-experimental-packages": ["moonbitlang/core/archive/zip"])
