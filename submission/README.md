@@ -23,6 +23,7 @@
 | `assets/terminal-review.png` | 第 2 页证据：命令行实录，73 C → 100 A（文本取自真实运行输出） |
 | `assets/review-draft.png` | 备用证据：真实样本的 HTML 体检报告（64/100 C） |
 | `assets/review-final.png` | 备用证据：修好后的 100/100 A |
+| `dist/STDU2026-一稿过.skill` | 可直接上传的技能包（`dist/` 不入库，本地生成） |
 
 ## 提交前必须替换
 
@@ -36,6 +37,8 @@
 ```bash
 python submission/build_ppt.py              # 五页（默认）：封面 + 三页正文 + 落地路线
 python submission/build_ppt.py --pages 3    # 只出赛事模板的三页正文
+
+python scripts/package_skill.py -o "dist/STDU2026-一稿过.skill"   # 上传用的技能包（66 个条目）
 ```
 
 > 赛事说明 PDF 写的是「三页方案、每页一屏」。五页版是答辩 / 路演用的加长版（封面与路线页不计入正文三页）；
