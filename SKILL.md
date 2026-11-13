@@ -7,6 +7,10 @@ metadata:
 
 # Word 智能文档处理(Word Document Intelligence)
 
+> 本技能是一本**可执行的 Word 指南书**：决策地图在 `AGENT-GUIDE.md`，机器可读清单在 `capabilities.json`，
+> 唯一入口是 `python scripts/docx_agent.py <task>`（`list` 看全部 14 个任务，`--dry-run` 先看命令再执行）。
+> 不确定该用哪个脚本时，先跑 `docx_agent.py list`，不要凭记忆猜脚本名。
+
 核心理念:**先理解 Word,再操作 Word。**
 
 不是"套模板",而是"理解文档"。任何 .docx 都是一套精密的格式体系:页面、样式、编号、页眉页脚、域、表格规则。用户把它交给你,是要求你**在它的体系内**工作,而不是重新设计一个你认为好看的文档。本 Skill 的全部机制都围绕这一点。
@@ -189,3 +193,17 @@ python <skill>/scripts/repair_docx.py 输出.docx --fix empty-paragraphs,heading
 - **把大框识别成题目表格**——单个大容器不代表按题分行;先渲染原模板,再按用户认定的视觉结构处理。
 - **缩放后沿用旧裁剪框**——重新采集同一帧的坐标和变换,核对首末代码行与输出,重新生成裁图并替换最终 DOCX 的图片。
 - **只核对图片数量**——92 张图也可能放错题;逐题核对代码、输出、分析三者,数量检查不能证明语义正确。
+
+## 10. 唯一入口：docx_agent.py
+
+```
+python scripts/docx_agent.py list              # 14 个任务：何时用 / 命令 / 产出 / 工作流
+python scripts/docx_agent.py --capabilities    # 机器可读清单（capabilities.json）
+python scripts/docx_agent.py <task> [参数...]  # 直接路由到对应脚本，退出码原样透传
+python scripts/docx_agent.py <task> --dry-run  # 只打印将执行的命令，不产生副作用
+python scripts/docx_agent.py --doctor          # 依赖 / 脚本 / 规则包 / 文档一致性自检
+python scripts/docx_agent.py --guide           # AGENT-GUIDE.md 的章节目录
+```
+
+中文别名可用：`分析`→analyze、`体检/审查/合规`→review、`验证/格式差异`→validate、`修复`→repair、`渲染/出图`→render。
+路由表与脚本永远不会漂移——`tests/test_docx_agent.py` 会检查清单里写的每个脚本、工作流、文档是否真的存在。

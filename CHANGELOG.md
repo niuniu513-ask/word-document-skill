@@ -1,3 +1,18 @@
+## 1.5.0
+
+### 新增：一本可执行的指南书
+
+- `AGENT-GUIDE.md`：任务路由表（自然语言 → task → 命令 → 产出）、五阶段闭环与逐阶段验收标准、
+  14 个任务的输入输出契约、11 条真实失败模式台账（现象 / 诊断 / 修法）、质量门与边界。
+- `capabilities.json`：同一份知识的机器可读清单（14 个任务，含 `when` 触发语、命令示例、输入产出、下一步）。
+- `scripts/docx_agent.py`：唯一入口。`list` / `--capabilities` / `--doctor` / `--guide` / `--dry-run`，
+  支持中文别名（体检、审查、合规、生成、修复、渲染…），退出码原样透传。`--doctor` 一次检查依赖、
+  脚本、规则包与文档是否齐全。
+- `tests/test_docx_agent.py`（12 项）：清单自洽（引用不存在的脚本/工作流/文档即失败）、任务契约完整、
+  JSON 输出合法、未知任务退出码 2、`--dry-run` 无副作用、`--doctor` 就绪。
+- `package_skill.py` 打包时纳入 `AGENT-GUIDE.md`、`capabilities.json` 与 `rules/`。
+- README 顶部改为「指南书」定位，新增「一条命令开始」五阶段表；SKILL.md 增加 §10 入口说明。
+
 # Changelog
 
 All notable changes to **word-document-skill** are documented in this file.

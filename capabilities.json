@@ -1,0 +1,316 @@
+{
+  "name": "word-document-skill",
+  "version": "1.5.0",
+  "positioning": "Word 文档智能体指南书 + 工具链：分析 → 规划 → 生成/编辑 → 修复 → 渲染 → 体检 → 验证",
+  "docs": {
+    "guide": "AGENT-GUIDE.md",
+    "skill": "SKILL.md",
+    "readme": "README.md",
+    "rules": "references/compliance-rules.md"
+  },
+  "iron_rules": [
+    "不在文档自己的格式系统之外造格式：先分析、再在既定样式里写。",
+    "不编造数据：缺什么写【待补充：…】，并把它列进交付说明。",
+    "改完必须验证：格式差异 ≈ 0 + 逐页渲染核对，最多 3 轮修复。"
+  ],
+  "exit_codes": {
+    "0": "通过（无阻断问题）",
+    "1": "有阻断问题",
+    "2": "用法或输入错误"
+  },
+  "tasks": [
+    {
+      "id": "analyze",
+      "title": "分析文档，产出 Document Specification",
+      "when": [
+        "这个文档是什么结构/格式",
+        "要按它的格式做一份新的",
+        "先看清样式与页面设置"
+      ],
+      "script": "scripts/analyze_docx.py",
+      "args": "<docx> -o spec.json",
+      "inputs": [
+        "docx"
+      ],
+      "outputs": [
+        "spec.json"
+      ],
+      "workflow": "workflows/analyze.md",
+      "next": [
+        "generate",
+        "validate"
+      ]
+    },
+    {
+      "id": "extract",
+      "title": "提取正文内容模型与 Markdown 视图",
+      "when": [
+        "把内容搬进另一个模板",
+        "我要看看里面到底写了什么",
+        "内容迁移前先取一份内容模型"
+      ],
+      "script": "scripts/extract_content.py",
+      "args": "<docx> -o content.json --markdown out.md",
+      "inputs": [
+        "docx"
+      ],
+      "outputs": [
+        "content.json",
+        "out.md"
+      ],
+      "workflow": "workflows/content-migration.md",
+      "next": [
+        "generate"
+      ]
+    },
+    {
+      "id": "styles",
+      "title": "样式全量详查（人读）",
+      "when": [
+        "样式到底怎么定义的",
+        "为什么某一级标题长得不对",
+        "要挑一个正文样式名来生成"
+      ],
+      "script": "scripts/inspect_styles.py",
+      "args": "<docx> --style \"Head*\" --text styles.txt",
+      "inputs": [
+        "docx"
+      ],
+      "outputs": [
+        "styles.txt"
+      ],
+      "workflow": "workflows/analyze.md",
+      "next": [
+        "generate"
+      ]
+    },
+    {
+      "id": "generate",
+      "title": "在既有格式系统内生成/插入/填充",
+      "when": [
+        "照这个模板写一份",
+        "在原文档某段后面插入一节",
+        "把占位符填成真实数据"
+      ],
+      "script": "scripts/generate_docx.py",
+      "args": "<template> --content content.json -o out.docx --mode fill",
+      "inputs": [
+        "docx 模板或 spec",
+        "content.json"
+      ],
+      "outputs": [
+        "out.docx"
+      ],
+      "workflow": "workflows/generate.md",
+      "next": [
+        "validate",
+        "render"
+      ]
+    },
+    {
+      "id": "validate",
+      "title": "格式差异 + 结构体检",
+      "when": [
+        "我改完有没有动到别的版式",
+        "交付前做一次机器验收",
+        "delta 必须为 0"
+      ],
+      "script": "scripts/validate_docx.py",
+      "args": "--original before.docx --final after.docx",
+      "inputs": [
+        "before.docx",
+        "after.docx"
+      ],
+      "outputs": [
+        "差异报告"
+      ],
+      "workflow": "workflows/edit.md",
+      "next": [
+        "review"
+      ]
+    },
+    {
+      "id": "review",
+      "title": "一键合规体检（打分 + 逐条修法）",
+      "when": [
+        "这份能不能报审/能不能交",
+        "格式合不合规",
+        "按规则包给我一份问题清单"
+      ],
+      "script": "scripts/review.py",
+      "args": "<docx> --profile railway-plan -o report.md --html report.html",
+      "inputs": [
+        "docx",
+        "rules/*.json"
+      ],
+      "outputs": [
+        "report.md",
+        "report.html"
+      ],
+      "workflow": "workflows/compliance-review.md",
+      "next": [
+        "repair",
+        "validate"
+      ]
+    },
+    {
+      "id": "repair",
+      "title": "自动修复常见排版问题（默认 dry-run）",
+      "when": [
+        "编号混用/空段落/假标题帮我修掉",
+        "已经是问题清单，按它修"
+      ],
+      "script": "scripts/repair_docx.py",
+      "args": "<docx> --fix numbering,empty --apply -o fixed.docx",
+      "inputs": [
+        "docx"
+      ],
+      "outputs": [
+        "fixed.docx"
+      ],
+      "workflow": "references/repair-rules.md",
+      "next": [
+        "validate"
+      ]
+    },
+    {
+      "id": "render",
+      "title": "docx → PDF → 逐页 PNG（视觉验收）",
+      "when": [
+        "生成 PDF 给我看",
+        "每页导出图片我要核对",
+        "目录页码域没更新"
+      ],
+      "script": "scripts/render_docx.py",
+      "args": "<docx> -o pages/ --dpi 110 --update-fields",
+      "inputs": [
+        "docx"
+      ],
+      "outputs": [
+        "pdf",
+        "png/*.png"
+      ],
+      "workflow": "references/visual-qa.md",
+      "next": [
+        "evidence"
+      ]
+    },
+    {
+      "id": "evidence",
+      "title": "截图证据对账（标签数/图片数/空图/变形）",
+      "when": [
+        "报告里的截图数量对不对",
+        "有没有插入空图或宽黑条",
+        "交付前核一遍证据"
+      ],
+      "script": "scripts/verify_evidence.py",
+      "args": "<docx> --label 代码截图 --expect 代码截图=29 --strict",
+      "inputs": [
+        "docx"
+      ],
+      "outputs": [
+        "对账报告"
+      ],
+      "workflow": "references/screenshot-evidence.md"
+    },
+    {
+      "id": "crop",
+      "title": "按明确坐标裁图并记录来源哈希",
+      "when": [
+        "截图里只要某一块",
+        "要证明这张图是从哪张原图裁的"
+      ],
+      "script": "scripts/crop_evidence.py",
+      "args": "raw.png crop.png --box X Y W H --identity cell5/code",
+      "inputs": [
+        "raw.png"
+      ],
+      "outputs": [
+        "crop.png",
+        "来源哈希"
+      ],
+      "workflow": "references/screenshot-evidence.md",
+      "next": [
+        "evidence"
+      ]
+    },
+    {
+      "id": "capture",
+      "title": "滚动窗口采集并拼接（Windows）",
+      "when": [
+        "要真实 IDE/终端截图",
+        "窗口比屏幕高，需要滚动拼接"
+      ],
+      "script": "scripts/capture_notebook.py",
+      "args": "--title \"Visual Studio Code\" --stitch --out frames/",
+      "inputs": [
+        "窗口"
+      ],
+      "outputs": [
+        "拼接长图"
+      ],
+      "workflow": "workflows/lab-report-screenshots.md",
+      "next": [
+        "crop"
+      ]
+    },
+    {
+      "id": "notebook-html",
+      "title": "把已执行的 notebook 渲染成独立 HTML（供无头截图）",
+      "when": [
+        "notebook 要出截图",
+        "没有 IDE 也要拿到真实输出"
+      ],
+      "script": "scripts/render_nb_html.py",
+      "args": "<notebook> -o nb.html --width 1100",
+      "inputs": [
+        "*.ipynb"
+      ],
+      "outputs": [
+        "nb.html"
+      ],
+      "workflow": "workflows/lab-report-runbook.md",
+      "next": [
+        "capture"
+      ]
+    },
+    {
+      "id": "lab-report",
+      "title": "严格模板实验报告：执行 + 采集 + 合成",
+      "when": [
+        "按学校模板做实验报告",
+        "要真实运行结果截图"
+      ],
+      "script": "scripts/lab_report.py",
+      "args": "--help",
+      "inputs": [
+        "模板 docx",
+        "notebook"
+      ],
+      "outputs": [
+        "report docx",
+        "fp.json"
+      ],
+      "workflow": "workflows/lab-report-runbook.md",
+      "next": [
+        "render",
+        "evidence"
+      ]
+    },
+    {
+      "id": "package",
+      "title": "把 skill 打包成可分发的 .skill",
+      "when": [
+        "要发给别人/上传技能市场"
+      ],
+      "script": "scripts/package_skill.py",
+      "args": "-o dist/word-document-skill.skill",
+      "inputs": [
+        "仓库"
+      ],
+      "outputs": [
+        ".skill zip"
+      ]
+    }
+  ]
+}

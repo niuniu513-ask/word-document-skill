@@ -4,7 +4,7 @@
 Usage:
     python scripts/package_skill.py [--output dist/word-document-skill.skill]
 
-Includes: SKILL.md, README.md, LICENSE, scripts/, schemas/, workflows/,
+Includes: SKILL.md, AGENT-GUIDE.md, capabilities.json, README.md, LICENSE, scripts/, schemas/, workflows/,
 references/, evals/, examples/. Excludes tests, __pycache__, .git, etc.
 """
 from __future__ import annotations
@@ -16,8 +16,8 @@ from pathlib import Path
 
 SKILL_ROOT = Path(__file__).resolve().parent.parent
 
-INCLUDE_DIRS = ["scripts", "schemas", "workflows", "references", "evals", "examples"]
-INCLUDE_FILES = ["SKILL.md", "README.md", "LICENSE", "CHANGELOG.md",
+INCLUDE_DIRS = ["scripts", "schemas", "workflows", "references", "evals", "examples", "rules"]
+INCLUDE_FILES = ["SKILL.md", "AGENT-GUIDE.md", "capabilities.json", "README.md", "LICENSE", "CHANGELOG.md",
                  "requirements.txt", "requirements-notebook.txt", "pyproject.toml"]
 EXCLUDE_PATTERNS = ["__pycache__", ".pyc", ".pyo", ".pytest_cache", ".git",
                     ".DS_Store", "Thumbs.db", "*.skill"]

@@ -1,15 +1,40 @@
 # word-document-skill
 
-> **Word Document Intelligence** — 先理解任何 .docx 的结构与格式，再在原有格式体系内完成生成、修改、填充、排版、迁移与批量处理。
+> **Word Document Intelligence** — 一份给智能体的 Word 工作指南书：先理解任何 .docx 的结构与格式，再在原有格式体系内完成分析、生成、修改、填充、修复、渲染、体检与验证。
 
 [![CI](https://github.com/niuniu513-ask/word-document-skill/actions/workflows/ci.yml/badge.svg)](https://github.com/niuniu513-ask/word-document-skill/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Tests](https://img.shields.io/badge/tests-82%20passed-brightgreen)]()
+[![Tests](https://img.shields.io/badge/tests-94%20passed-brightgreen)]()
 
 核心理念：**先理解 Word，再操作 Word。不是"套模板"，而是"理解文档"。**
 
 任何 .docx 都是一套精密的格式体系——页面、样式、编号、页眉页脚、域、表格规则。本 Skill 的全部机制都围绕"在它的体系内工作"而设计，默认 **Formatting Delta ≈ 0**（只改变用户要求改变的东西）。
+
+---
+
+## 一条命令开始
+
+这个仓库不是「一堆脚本」，而是一本可执行的 Word 指南书：`AGENT-GUIDE.md` 写判断，`capabilities.json` 写清单，
+`scripts/docx_agent.py` 是唯一入口——智能体不必记住十几个脚本名。
+
+```bash
+python scripts/docx_agent.py list             # 14 个任务：何时用、命令长什么样、产出什么
+python scripts/docx_agent.py --capabilities   # 同一份清单的机器可读版（给智能体路由用）
+python scripts/docx_agent.py analyze a.docx -o spec.json
+python scripts/docx_agent.py review a.docx --profile railway-plan --html r.html   # 中文别名也行：体检 / 审查 / 合规
+python scripts/docx_agent.py --doctor         # 依赖、脚本、规则包、文档一致性自检
+```
+
+| 阶段 | 任务 | 产出 | 验收标准 |
+|---|---|---|---|
+| ① 分析 | `analyze` / `extract` / `styles` | spec.json、content.json、样式详查 | 说得清正文样式、字号、页面尺寸、页边距 |
+| ② 规划 | 人（或智能体）写清改哪里 | 改动清单 | 用户确认「改哪里、不改哪里」 |
+| ③ 执行 | `generate` / `repair` | docx | 只动目标段落，不新增样式，不改页面设置 |
+| ④ 验证 | `validate` / `review` / `render` / `evidence` | 差异清单、体检报告、逐页 PNG、证据对账 | 格式差异只含目标改动；逐页看过受影响页 |
+| ⑤ 交付 | 交付说明 | 改了什么/没改什么/哪些待补充 | 附验证数字 |
+
+完整判断规则、输入输出契约与 11 条踩坑台账见 **[AGENT-GUIDE.md](AGENT-GUIDE.md)**。
 
 ---
 
@@ -157,6 +182,8 @@ python scripts/review.py 方案.docx --profile railway-plan --html 体检.html
 ```
 word-document-skill/
 ├── SKILL.md                 # Agent 入口：六阶段工作流 + 铁律 + 任务路由
+├── AGENT-GUIDE.md           # 指南书正文：任务路由表 + 五阶段验收 + 失败模式台账
+├── capabilities.json        # 同一份知识的机器可读版（14 个任务，测试守住一致性）
 ├── README.md                # 本文件
 ├── LICENSE                  # MIT
 ├── CHANGELOG.md             # 版本变更记录
@@ -165,7 +192,8 @@ word-document-skill/
 ├── requirements.txt         # 运行时依赖
 ├── requirements-dev.txt     # 开发依赖
 ├── rules/                   # 3 套合规规则包（railway-plan / lab-report / generic）
-├── scripts/                 # 17 个 Python 脚本 + 2 个 Node 采集脚本
+├── scripts/                 # 18 个 Python 脚本 + 2 个 Node 采集脚本
+│   ├── docx_agent.py        # 唯一入口：任务路由 / 清单 / 自检 / dry-run
 │   ├── _docx_utils.py       # 共享工具（XML解析、样式链、编号解析等）
 │   ├── analyze_docx.py      # 文档分析 → Document Specification
 │   ├── generate_docx.py     # 模板/spec 内生成
@@ -191,7 +219,7 @@ word-document-skill/
 ├── references/              # 10 篇通用深度规则文档
 │   └── lab-report/          # 实验报告专用：配置字段、离屏采集、通用/本类/个案分档说明
 ├── evals/                   # 集成测试用例（4 个场景）
-├── tests/                   # 单元测试（pytest，82 项）
+├── tests/                   # 单元测试（pytest，94 项）
 ├── examples/                # content.json 示例
 └── .github/                 # CI + Issue Templates
 ```
