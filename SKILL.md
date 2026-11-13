@@ -7,6 +7,9 @@ metadata:
 
 # Word 智能文档处理(Word Document Intelligence)
 
+> **一稿过 / OneDraft** —— 本仓库参加石家庄铁道大学「天翼智创杯」TeleAgent 智能体创新竞赛的对外名称，
+> 指向同一个能力：把「怎么改 Word 才算对」写成智能体能执行的判断。打包分发时用 `STDU2026-一稿过.skill`。
+
 > 本技能是一本**可执行的 Word 指南书**：决策地图在 `AGENT-GUIDE.md`，机器可读清单在 `capabilities.json`，
 > 唯一入口是 `python scripts/docx_agent.py <task>`（`list` 看全部 14 个任务，`--dry-run` 先看命令再执行）。
 > 不确定该用哪个脚本时，先跑 `docx_agent.py list`，不要凭记忆猜脚本名。

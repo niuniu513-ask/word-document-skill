@@ -1,5 +1,6 @@
-# word-document-skill
+# word-document-skill · 一稿过（OneDraft）
 
+> **一稿过 / OneDraft** —— 石家庄铁道大学「天翼智创杯」TeleAgent 参赛作品。
 > **Word Document Intelligence** — 一份给智能体的 Word 工作指南书：先理解任何 .docx 的结构与格式，再在原有格式体系内完成分析、生成、修改、填充、修复、渲染、体检与验证。
 
 [![CI](https://github.com/niuniu513-ask/word-document-skill/actions/workflows/ci.yml/badge.svg)](https://github.com/niuniu513-ask/word-document-skill/actions/workflows/ci.yml)
