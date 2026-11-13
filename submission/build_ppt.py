@@ -1,19 +1,19 @@
 #!/usr/bin/env python3
-"""生成参赛用的三页方案 PPT（每页一屏）。
+"""生成参赛方案 PPT —— 默认五页（封面 + 三页正文 + 落地路线），也可只出赛事要求的三页。
 
-按赛事模板：① 场景与问题 ② 技能与实现 ③ 效果与复用。
-
+作品名：一稿过（OneDraft）· Word 智能体指南书
 作品定位：一份给智能体的 Word 工作指南书（AGENT-GUIDE.md + capabilities.json + docx_agent.py），
 审查只是它的一个能力，覆盖 分析→生成→修复→渲染→体检→验证 的完整闭环。
-姓名、专业班级、试用数据留成占位符，请在 `PEOPLE` 里改完再重新生成：
 
-    python submission/build_ppt.py
+    python submission/build_ppt.py            # 五页（封面 / 场景 / 实现 / 效果 / 路线）
+    python submission/build_ppt.py --pages 3  # 只出赛事模板要求的三页正文
 
-依赖 python-pptx；不需要模板文件，版式全部用图形画。
+姓名、专业班级、试用数据留成占位符，请在 `PEOPLE` 里改完再重新生成。依赖 python-pptx。
 """
 
 from __future__ import annotations
 
+import argparse
 from pathlib import Path
 
 from pptx import Presentation
@@ -28,8 +28,12 @@ ASSETS = HERE / "assets"
 PEOPLE = {
     "name": "【姓名】",
     "class_name": "【专业班级】",
-    "skill": "STDU2026-Word文档智能体指南",
+    "school": "石家庄铁道大学",
+    "contact": "【手机 / 邮箱】",
+    "skill": "STDU2026-一稿过",
 }
+BRAND = "一稿过"
+BRAND_EN = "OneDraft"
 
 INK = RGBColor(0x1F, 0x23, 0x29)
 MUTED = RGBColor(0x64, 0x6A, 0x73)
@@ -51,8 +55,7 @@ def textbox(slide, x, y, w, h, text="", size=12, bold=False, color=INK, align=PP
     tf.margin_left = tf.margin_right = Emu(0)
     tf.margin_top = tf.margin_bottom = Emu(0)
     tf.vertical_anchor = anchor
-    lines = text.split("\n")
-    for i, line in enumerate(lines):
+    for i, line in enumerate(text.split("\n")):
         para = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
         para.alignment = align
         para.line_spacing = line_spacing
@@ -102,6 +105,32 @@ def footer(slide, text):
     textbox(slide, Inches(0.7), Inches(6.95), Inches(11.9), Inches(0.3), text, size=9, color=MUTED)
 
 
+def cover(prs):
+    s = prs.slides.add_slide(prs.slide_layouts[6])
+    kicker(s, "石家庄铁道大学 · 天翼智创杯 TeleAgent 智能体创新竞赛　｜　选题：铁路与交通（工务 / 信号施工方案）")
+    textbox(s, Inches(0.7), Inches(1.55), Inches(7.4), Inches(1.7), BRAND, size=104, bold=True, color=INK,
+            line_spacing=1.0)
+    textbox(s, Inches(0.75), Inches(3.28), Inches(6.6), Inches(0.4), f"{BRAND_EN}　·　Word 智能体指南书", size=20,
+            bold=True, color=BLUE)
+    textbox(s, Inches(0.7), Inches(3.92), Inches(11.4), Inches(0.9),
+            "让智能体改 Word 时，格式不动、数据不编、改完能验 —— 把“怎么改才算对”写成它能执行的判断。",
+            size=22, bold=True, color=INK, line_spacing=1.35)
+
+    stats = [("94", "个自动化测试全绿"), ("0.6", "秒 / 份合规体检"), ("0", "目标改动之外的格式漂移")]
+    xs = [Inches(0.7), Inches(4.85), Inches(9.0)]
+    for (num, label), x in zip(stats, xs):
+        card(s, x, Inches(5.05), Inches(3.9), Inches(0.95), WHITE)
+        textbox(s, x + Inches(0.24), Inches(5.17), Inches(0.86), Inches(0.5), num, size=24, bold=True, color=BLUE)
+        textbox(s, x + Inches(1.16), Inches(5.28), Inches(2.5), Inches(0.55), label, size=11, color=INK,
+                line_spacing=1.3)
+
+    textbox(s, Inches(0.7), Inches(6.28), Inches(11.9), Inches(0.34),
+            f"参赛人：{PEOPLE['name']}　·　{PEOPLE['class_name']}　·　{PEOPLE['school']}　·　{PEOPLE['contact']}",
+            size=12, bold=True, color=INK)
+    footer(s, "作品本体：word-document-skill 仓库（AGENT-GUIDE.md / capabilities.json / scripts/docx_agent.py），MIT 许可，代码与测试公开可复现")
+    return s
+
+
 def slide1(prs):
     s = prs.slides.add_slide(prs.slide_layouts[6])
     kicker(s, "① 场景与问题（为什么做）")
@@ -109,7 +138,7 @@ def slide1(prs):
 
     cards = [
         ("谁在用", "接 Word 任务的智能体（Claude / Cursor / Coze）+ 资料员、教师、学生。\n\n"
-                   "共同点：都要在**别人的模板**里交东西，且格式不能变。"),
+                   "共同点：都要在别人的模板里交东西，且格式不能变。"),
         ("什么场景", "施工方案报监理前的最后一轮自查；\n课程报告交给老师前的“格式过一遍”；\n一份模板套 20 份数据的批量生成。\n\n"
                      "模板长、条款散、每次都赶时间。"),
         ("原来卡在哪", "每个新会话都要重新教一遍“这份文档的样式叫什么”；\n改完说不清动了哪些格式；\n"
@@ -120,17 +149,16 @@ def slide1(prs):
         card(s, x, Inches(1.95), Inches(3.9), Inches(2.6), WHITE)
         rule(s, x, Inches(1.95), Inches(3.9), BLUE, 3.0)
         textbox(s, x + Inches(0.28), Inches(2.14), Inches(3.34), Inches(0.3), head_t, size=15, bold=True, color=BLUE)
-        textbox(s, x + Inches(0.28), Inches(2.52), Inches(3.34), Inches(1.9), body.replace("**", ""), size=11,
-                color=INK, line_spacing=1.4)
+        textbox(s, x + Inches(0.28), Inches(2.52), Inches(3.34), Inches(1.9), body, size=11, color=INK,
+                line_spacing=1.4)
 
-    textbox(s, Inches(0.7), Inches(4.8), Inches(11.9), Inches(0.3), "真实样本里的三个硬伤（review.py 实测，不是估计）", size=13,
-            bold=True, color=INK)
+    textbox(s, Inches(0.7), Inches(4.8), Inches(11.9), Inches(0.3), "真实样本里的三个硬伤（review.py 实测，不是估计）",
+            size=13, bold=True, color=INK)
     chips = [
         ("13", "处【待补充】藏在表格单元格里\n（正文看着是齐的）"),
         ("10", "个必备章节全缺\n（工程概况、编制依据、施工方案…）"),
         ("0", "个页码域\n（页脚是空的，手打的不算）"),
     ]
-    xs = [Inches(0.7), Inches(4.85), Inches(9.0)]
     for (num, label), x in zip(chips, xs):
         card(s, x, Inches(5.2), Inches(3.9), Inches(1.1))
         textbox(s, x + Inches(0.24), Inches(5.33), Inches(0.78), Inches(0.8), num, size=30, bold=True, color=ORANGE)
@@ -226,14 +254,70 @@ def slide3(prs):
     footer(s, "全部数字可用仓库命令复现：pytest -q（94 passed）、review.py（0.56–0.61 s）、validate_docx.py（format_delta_count）。")
 
 
+def closing(prs):
+    s = prs.slides.add_slide(prs.slide_layouts[6])
+    kicker(s, "④ 落地路线与团队（怎么继续）", GREEN)
+    title(s, "从“我这边能跑”到“别人敢拿去用”", size=26)
+
+    cols = [
+        ("接下来两周", BLUE, [
+            "补工务、信号各 2 套真实方案做回归集",
+            "规则包扩到 6 套（施工日志、技术交底、月度总结）",
+            "第 3 页「验证者」换成真实试用记录",
+        ]),
+        ("这学期", ORANGE, [
+            "在班级 / 实验室做 20 人试用，收集退回原因",
+            "把 AGENT-GUIDE.md 出英文版，接 Coze / Cursor",
+            "TOC 与 numbering 规则补齐，覆盖率到 90% 检查项",
+        ]),
+        ("往下一年", GREEN, [
+            "接电信侧文档场景：工单规范、运维手册、交底纪要",
+            "做评测基准：30 份带标准答案的文档，公开跑分",
+            "把入口封成 MCP 工具，任何智能体可挂载",
+        ]),
+    ]
+    xs = [Inches(0.7), Inches(4.85), Inches(9.0)]
+    for (head_t, color, items), x in zip(cols, xs):
+        card(s, x, Inches(1.85), Inches(3.9), Inches(2.95), WHITE)
+        rule(s, x, Inches(1.85), Inches(3.9), color, 3.0)
+        textbox(s, x + Inches(0.26), Inches(2.02), Inches(3.4), Inches(0.3), head_t, size=14, bold=True, color=color)
+        body = "\n\n".join(f"· {item}" for item in items)
+        textbox(s, x + Inches(0.26), Inches(2.44), Inches(3.4), Inches(2.2), body, size=10, color=INK,
+                line_spacing=1.45)
+
+    card(s, Inches(0.7), Inches(5.02), Inches(11.93), Inches(1.15), CARD)
+    textbox(s, Inches(0.95), Inches(5.15), Inches(11.4), Inches(0.28), "为什么是我们（不是“再做一个知识库问答”）", size=12,
+            bold=True, color=INK)
+    textbox(s, Inches(0.95), Inches(5.48), Inches(11.4), Inches(0.6),
+            "把“格式不变、数据不编、改完必验”写成智能体可执行的判断与验收卡口 —— 已经有 94 个测试和一个 CI 在守它；"
+            "换单位、换文种、换智能体，都只需改一处。",
+            size=10.5, color=INK, line_spacing=1.45)
+
+    textbox(s, Inches(0.7), Inches(6.28), Inches(11.9), Inches(0.34),
+            f"{BRAND}（{BRAND_EN}）· {PEOPLE['name']} · {PEOPLE['class_name']} · {PEOPLE['contact']}",
+            size=12, bold=True, color=INK)
+    footer(s, "仓库：github.com/niuniu513-ask/word-document-skill　｜　MIT　｜　全部数字可用仓库命令复现，未做过的试用不写数字")
+    return s
+
+
 def main() -> int:
+    parser = argparse.ArgumentParser(description="生成参赛 PPT")
+    parser.add_argument("--pages", type=int, choices=(3, 5), default=5, help="3=赛事模板三页正文；5=封面+三页正文+路线（默认）")
+    parser.add_argument("--out", type=Path, default=None)
+    args = parser.parse_args()
+
     prs = Presentation()
     prs.slide_width, prs.slide_height = W, H
+    if args.pages == 5:
+        cover(prs)
     for build in (slide1, slide2, slide3):
         build(prs)
-    out = HERE / f"{PEOPLE['skill']}-{PEOPLE['name']}-{PEOPLE['class_name']}.pptx"
+    if args.pages == 5:
+        closing(prs)
+
+    out = args.out or HERE / f"{PEOPLE['skill']}-{PEOPLE['name']}-{PEOPLE['class_name']}.pptx"
     prs.save(out)
-    print(f"[ok] {out}")
+    print(f"[ok] {out}  ({args.pages} pages)")
     return 0
 
 
