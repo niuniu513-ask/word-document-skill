@@ -45,3 +45,4 @@ page-*.png
 # Local config
 .env
 .env.local
+submission/preview/
