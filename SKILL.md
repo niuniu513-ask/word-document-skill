@@ -131,6 +131,17 @@ python <skill>/scripts/render_docx.py 输出.docx -o 渲染目录 --dpi 110 --up
 python <skill>/scripts/verify_evidence.py 输出.docx --label 代码截图 --label 实验结果截图 -o evidence.json
 ```
 
+需要机器可读的结构化结果、或不依赖 `python-docx` 的独立校验时,可以走原生引擎(`engine/`,MoonBit 实现,约 4,600 行):
+
+```bash
+python <skill>/scripts/mbt_engine.py doctor            # 先确认工具链与引擎可用;不可用就照常走上面的 Python 路线
+python <skill>/scripts/mbt_engine.py analyze 输入.docx -o spec.json
+python <skill>/scripts/mbt_engine.py fill 输入.docx --set "【待补充】=已确认" --out 输出.docx
+python <skill>/scripts/mbt_engine.py validate 原文档.docx 输出.docx   # format_delta 应为 0
+```
+
+两条路线给的是同一套契约(分析 / 编辑 / 校验),结果应互相印证;不一致时以"能被 Word 正确打开 + 渲染检查通过"为准,并把差异如实报告。
+
 然后用 Read 逐页查看渲染出的 page-XXX.png,按下表检查(完整版见 references/visual-qa.md):
 
 空白页/大面积空白 · 标题孤立页尾 · 图片变形 · 表格溢出版心或断裂异常 · 文字溢出 · 页眉页脚丢失 · 页码异常 · 边距异常 · 字体行距异常 · 目录页码错误。

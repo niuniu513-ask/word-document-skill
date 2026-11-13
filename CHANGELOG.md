@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-11-13
+
+### Added
+- **原生 MoonBit 引擎 `engine/`**（4,612 行，独立 `moon.mod`，MIT）：从 OOXML 层实现命名空间感知的 XML 解析与序列化、`.docx` 包读写、`basedOn` 样式链、Document Specification 与规则引擎、跨 run 字符级替换、格式漂移校验；自带 CLI（`info` / `text` / `outline` / `parts` / `styles` / `paragraphs` / `tables` / `analyze` / `issues` / `fill` / `validate`）与 34 项测试，可编译到 `--target js` 与 `--target wasm-gc`。
+- `scripts/mbt_engine.py`：Python 侧调用引擎的桥接（`doctor` / `analyze` / `validate` / `fill`）。工具链缺失时抛 `EngineUnavailable` 并静默降级，原有 Python 流程不受影响。
+- `tests/test_mbt_engine.py`：桥接的端到端测试——分析结果、伪标题检测、填充后 `format_delta == 0`，并用 `python-docx` 读回交叉验证；无工具链时自动 skip。
+- 引擎新增 `fake_heading` 规则：识别"居中 + 加粗 + 短文本但未使用标题样式"的伪标题（样本报告命中 2 处，与 Python 实现独立得出同一结果）。
+
+### Changed
+- README 新增「双实现：Python 与原生 MoonBit 引擎」一节，说明两套实现的分工、调用方式与交叉验证结果。
+
+### Fixed
+- 引擎：程序化创建的 XML 节点丢失命名空间前缀，填充后的文字在 Word 中不可见（写成 `<t>` 而非 `<w:t>`）；序列化器改为按作用域补齐 `xmlns`，并补回归测试。
+
+
 ## [1.3.0] - 2026-11-11
 
 ### Added
