@@ -11,6 +11,7 @@
 | `build_ppt.py` | 生成上面这份 PPT；改 `PEOPLE` 后重跑即可 |
 | `assets/review-draft.png` | 场景页证据：真实样本体检报告（64/100 C 级，3 条问题） |
 | `assets/review-final.png` | 效果页证据：同一样本修好后 100/100 A 级 |
+| `assets/terminal-review.png` | 第 2 页「如何证明能运行」：初稿 73 C（退出码 1）→ 定稿 100 A（退出码 0）的命令行实录，文本取自真实运行输出 |
 
 ## 提交前必须替换
 

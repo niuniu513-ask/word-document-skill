@@ -144,42 +144,54 @@ def slide2(prs):
             size=12.5, color=MUTED)
 
     feats = [
-        ("01 一键体检", "输入：一份 .docx\n输出：得分／等级／问题清单\n（每条带位置、详情、怎么改）",
-         "0.6 秒跑完 48 段 9 表；\n退出码 0/1，可直接做 CI 卡口；\n--html 产出可截图的报告。"),
-        ("02 规则包", "输入：rules/*.json\n输出：该文种的检查口径",
-         "内置铁路施工方案（10 个必备章节）、\n实验报告（七要素）、通用体检；\n换单位只改 JSON，不改代码。"),
-        ("03 零漂移修复", "输入：原件 + 问题清单\n输出：只改该改的定稿",
-         "复用 repair_docx.py 自动修编号／空段落／页码域；\nvalidate_docx.py 逐项对比格式指纹，\n证明“没有动别人的版式”。"),
+        ("01 一键体检", "输入：一份 .docx　→　输出：得分／等级／问题清单（每条带位置、详情、怎么改）",
+         "48 段 9 表的真实文档 0.6 秒出结果；退出码 0/1 可直接做 CI 卡口；--html 产出可截图的自包含报告。"),
+        ("02 规则包", "输入：rules/*.json　→　输出：该文种的检查口径（必备章节、字号白名单、页面要求）",
+         "内置铁路施工方案（10 个必备章节）、实验报告（七要素）、通用体检；换单位、换文种只改 JSON，代码零改动。"),
+        ("03 零漂移修复", "输入：原件 + 问题清单　→　输出：只改该改的定稿",
+         "复用 repair_docx.py 自动修编号／空段落／页码域；validate_docx.py 逐项对比格式指纹，证明“没有动别人的版式”。"),
     ]
-    xs = [Inches(0.7), Inches(4.85), Inches(9.0)]
-    for (head, io, detail), x in zip(feats, xs):
-        card(s, x, Inches(1.95), Inches(3.9), Inches(2.75), WHITE)
-        rule(s, x, Inches(1.95), Inches(3.9), ORANGE, 3.0)
-        textbox(s, x + Inches(0.26), Inches(2.12), Inches(3.4), Inches(0.3), head, size=14, bold=True, color=ORANGE)
-        textbox(s, x + Inches(0.26), Inches(2.48), Inches(3.4), Inches(1.0), io, size=10.5, color=INK, line_spacing=1.35)
-        rule(s, x + Inches(0.26), Inches(3.58), Inches(3.36), LINE)
-        textbox(s, x + Inches(0.26), Inches(3.68), Inches(3.4), Inches(0.9), detail, size=10, color=MUTED,
-                line_spacing=1.35)
+    y = Inches(1.85)
+    for head, io, detail in feats:
+        card(s, Inches(0.7), y, Inches(7.2), Inches(1.25), WHITE)
+        rule(s, Inches(0.7), y, Inches(0.045), ORANGE, 1.0)
+        textbox(s, Inches(0.98), y + Inches(0.13), Inches(6.7), Inches(0.28), head, size=13.5, bold=True, color=ORANGE)
+        textbox(s, Inches(0.98), y + Inches(0.45), Inches(6.7), Inches(0.3), io, size=10, color=INK)
+        textbox(s, Inches(0.98), y + Inches(0.78), Inches(6.7), Inches(0.4), detail, size=9.5, color=MUTED,
+                line_spacing=1.3)
+        y += Inches(1.35)
 
-    textbox(s, Inches(0.7), Inches(4.92), Inches(11.9), Inches(0.3), "完整流程", size=12, bold=True, color=INK)
+    s.shapes.add_picture(str(ASSETS / "terminal-review.png"), Inches(8.2), Inches(1.85), width=Inches(4.43))
+    textbox(s, Inches(8.2), Inches(3.2), Inches(4.43), Inches(0.28),
+            "命令行实录（文本取自 2026-11-13 实际运行输出）", size=8.5, color=MUTED)
+
+    card(s, Inches(8.2), Inches(3.55), Inches(4.43), Inches(2.2), WHITE)
+    textbox(s, Inches(8.44), Inches(3.7), Inches(4.0), Inches(0.28), "差异化在哪", size=12, bold=True, color=ORANGE)
+    textbox(s, Inches(8.44), Inches(4.02), Inches(4.0), Inches(1.6),
+            "不做“帮你写一篇”，而是“判你这份能不能交”：\n"
+            "· 确定性规则，不是模型即兴点评\n"
+            "· 结论可量化：分数 + 逐条位置 + 修法\n"
+            "· 只改该改的，版式一字不动\n"
+            "· 规则与代码分离，换文种不写代码",
+            size=9, color=INK, line_spacing=1.45)
+
     steps = ["原文档", "分析 spec", "体检打分", "按清单修复", "复检 + 格式证明"]
     x = Inches(0.7)
     for i, step in enumerate(steps):
-        card(s, x, Inches(5.22), Inches(2.0), Inches(0.46), CARD)
-        textbox(s, x, Inches(5.28), Inches(2.0), Inches(0.35), step, size=11, bold=True, color=INK,
+        card(s, x, Inches(5.95), Inches(2.2), Inches(0.42), CARD)
+        textbox(s, x, Inches(6.01), Inches(2.2), Inches(0.3), step, size=10.5, bold=True, color=INK,
                 align=PP_ALIGN.CENTER)
-        x += Inches(2.0)
+        x += Inches(2.2)
         if i < len(steps) - 1:
-            textbox(s, x, Inches(5.28), Inches(0.33), Inches(0.3), "→", size=13, bold=True, color=ORANGE,
+            textbox(s, x, Inches(6.01), Inches(0.233), Inches(0.3), "→", size=12, bold=True, color=ORANGE,
                     align=PP_ALIGN.CENTER)
-            x += Inches(0.33)
+            x += Inches(0.233)
 
-    tech = ("技术路径：Python 3.10+ / python-docx + lxml 直接读写 OOXML；Document Specification 作为唯一事实来源；"
-            "规则包 JSON 驱动判定；PAGE 域、样式链、编号定义均解析原始 XML，不依赖 Word 进程。\n"
-            "差异化：不做“帮你写一篇”，而是“判你这份能不能交”——确定性规则 + 可量化结论 + 不动版式；"
-            "已用 82 个 pytest 用例与 CI 守住回归。")
-    textbox(s, Inches(0.7), Inches(5.86), Inches(11.9), Inches(0.9), tech, size=10, color=MUTED, line_spacing=1.4)
-    footer(s, "可运行证据：CI 全绿（GitHub Actions）；本地 pytest 82 passed；review.py / validate_docx.py 均有命令行实测截图。")
+    textbox(s, Inches(0.7), Inches(6.5), Inches(11.9), Inches(0.3),
+            "技术路径：Python 3.10+，python-docx + lxml 直接读写 OOXML；Document Specification 是唯一事实来源；"
+            "PAGE 域、样式链、编号定义都解析原始 XML，不依赖 Word 进程。",
+            size=9, color=MUTED)
+    footer(s, "可运行证据：GitHub Actions CI 全绿；本地 pytest 82 passed；requirements.txt 之外无私有依赖。")
 
 
 def slide3(prs):
