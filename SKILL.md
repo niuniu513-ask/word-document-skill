@@ -1,6 +1,6 @@
 ---
 name: word-document-skill
-description: Word 智能文档处理技能:先完整分析任何 .docx 的结构、样式与格式并建立 Document Specification,再严格在原文档格式体系内完成生成、修改、填充、润色、排版修复、格式迁移与批量生成,最后经过格式验证、PDF 渲染逐页视觉检查与自动修复闭环再交付。凡任务涉及 Word 文档、docx、模板、实验报告、实习报告、课程设计、实践报告、课程作业、通知、总结、会议纪要、申请书、填表、排版、格式修复、按模板生成、内容迁移等场景,必须使用本 Skill——只要需要读取、创建、修改、填充或排版 Word 文件,即使用户没有明确提到"Word",也应触发本 Skill。报告要求"真实代码截图/运行结果截图/VS Code 截图"时,同时按 workflows/lab-report-runbook.md 采集并核对证据。
+description: Word 智能文档处理技能:先完整分析任何 .docx 的结构、样式与格式并建立 Document Specification,再严格在原文档格式体系内完成生成、修改、填充、润色、排版修复、格式迁移与批量生成,最后经过格式验证、PDF 渲染逐页视觉检查与自动修复闭环再交付。另提供一键合规体检(review.py + rules/ 规则包):给文档打分、列出缺章节/占位符/编号/页码等阻断项并给修复建议。凡任务涉及 Word 文档、docx、模板、实验报告、实习报告、课程设计、实践报告、课程作业、通知、总结、会议纪要、申请书、填表、排版、格式修复、按模板生成、内容迁移,或问"这份方案能不能报审/能不能交/格式合不合规"等文档体检与合规初审场景,必须使用本 Skill——只要需要读取、创建、修改、填充或排版 Word 文件,即使用户没有明确提到"Word",也应触发本 Skill。报告要求"真实代码截图/运行结果截图/VS Code 截图"时,同时按 workflows/lab-report-runbook.md 采集并核对证据。
 metadata:
   compatibility: 需要 Python 3.10+;python-docx、lxml、Pillow 必装;渲染检查依赖 pywin32 + Microsoft Word(Windows)或 LibreOffice,以及 PyMuPDF
 ---
@@ -163,6 +163,7 @@ python <skill>/scripts/repair_docx.py 输出.docx --fix empty-paragraphs,heading
 | generate_docx.py | 模板/spec 内生成 | `--template/--spec --content -o --mode` |
 | render_docx.py | docx→PDF→逐页 PNG | `-o 目录 --dpi 110 --update-fields --pages 1-5` |
 | validate_docx.py | 格式差异 + 结构体检 | `--original --final` 或 `--check` |
+| review.py | 一键合规体检(打分+问题清单) | `--profile railway-plan\|lab-report\|generic` `--html --json --baseline` |
 | repair_docx.py | 自动修复(默认 dry-run) | `--fix a,b --apply -o` |
 | verify_evidence.py | 截图证据对账 | `--label 代码截图 --expect 代码截图=29 --strict` |
 | crop_evidence.py | 明确坐标裁图并保存来源哈希 | `raw.png crop.png --box X Y W H --identity cell5/code` |

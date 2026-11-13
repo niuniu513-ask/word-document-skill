@@ -11,6 +11,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CI 的 `test` 作业自 v1.3.0 起在收集阶段失败（`ModuleNotFoundError: No module named 'nbformat'`）：改装修 `requirements-notebook.txt`，并让 `tests/test_lab_report.py` 在缺少 notebook 依赖时 skip 而不是中断收集。
 
 
+## [1.4.0] - 2026-11-13
+
+### Added
+- `scripts/review.py`：一键合规体检。输出得分/等级/三级问题清单（阻断·严重·提示），每条带位置、详情与修复建议；支持 `-o` Markdown、`--html` 自包含报告、`--json` 机器可读、`--baseline` 附带格式漂移检查；退出码 0/1 可做 CI 卡口。
+- `rules/`：三套规则包 `railway-plan`（铁路施工方案报审自查，10 个必备章节）、`lab-report`（实验报告七要素）、`generic`（通用结构体检）。新增文种只需加一份 JSON。
+- `workflows/compliance-review.md`：体检工作流的适用场景、读报告方法、与 repair/validate 的衔接顺序、已知局限。
+- `references/compliance-rules.md`：规则包字段说明与编写建议。
+- `tests/test_review.py`：9 个用例，覆盖通过/缺章节/占位符/层级跳级/页码域/禁用语/规则包切换/报告渲染/退出码。
+
+### Changed
+- `SKILL.md` 触发条件新增"文档体检/合规初审/能不能报审"类表述，脚本速查表补 `review.py`。
+- 测试总数 73 → 82。
+
 ## [1.3.0] - 2026-11-11
 
 ### Added

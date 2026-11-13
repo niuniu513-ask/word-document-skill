@@ -5,7 +5,7 @@
 [![CI](https://github.com/niuniu513-ask/word-document-skill/actions/workflows/ci.yml/badge.svg)](https://github.com/niuniu513-ask/word-document-skill/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Tests](https://img.shields.io/badge/tests-73%20passed-brightgreen)]()
+[![Tests](https://img.shields.io/badge/tests-82%20passed-brightgreen)]()
 
 核心理念：**先理解 Word，再操作 Word。不是"套模板"，而是"理解文档"。**
 
@@ -119,6 +119,39 @@ python $S/repair_docx.py 输出.docx --fix empty-paragraphs,heading-keepnext --a
 
 更多示例见 [`examples/`](examples/)。
 
+## 合规体检（Compliance Review）
+
+判断"这份文档能不能交"，不再靠感觉。一条命令给出分数、等级和逐条问题清单：
+
+```bash
+python scripts/review.py 方案.docx --profile railway-plan --html 体检.html
+```
+
+```
+[review] 得分 64/100 等级 C 阻断 2 严重 1 提示 0
+```
+
+真实样本（`outputs/第四小组-…方案设计报告.docx`，48 段 / 9 表，1.6 s 跑完）：
+
+| 检查项 | 结论 |
+|---|---|
+| 必备章节 | ❌ 缺 10 节（工程概况、编制依据、施工组织、施工方案…） |
+| 占位符 | ❌ 13 个表格单元仍是【待补充】 |
+| 页码域 | ❌ 页脚没有 PAGE 域 |
+| 正文字号 / 字体 / 页面 | ✅ 10.5 pt 宋体，A4 21×29.7 cm |
+
+三套内置规则包，换单位只改 JSON、不改代码：
+
+| 规则包 | 面向 | 关键约束 |
+|---|---|---|
+| `railway-plan` | 铁路施工方案报审自查 | 10 个必备章节、A4、需 PAGE 域、正文 10.5–16 pt |
+| `lab-report` | 课程实验报告 | 目的/原理/器材/步骤/结果/分析/结论 七要素 |
+| `generic` | 通用文档 | 层级跳级、占位符、空段落、表格健康度 |
+
+规则包字段见 `references/compliance-rules.md`，使用流程与局限见 `workflows/compliance-review.md`。
+体检发现的问题可以交给 `repair_docx.py` 自动修（编号、空段落、页码域），
+内容类问题按报告里的"怎么改"人工补，改完再用 `validate_docx.py --original 原件 --final 修后` 证明格式没漂。
+
 ## 目录结构
 
 ```
@@ -131,11 +164,13 @@ word-document-skill/
 ├── pyproject.toml           # 包配置 + 工具配置
 ├── requirements.txt         # 运行时依赖
 ├── requirements-dev.txt     # 开发依赖
-├── scripts/                 # 16 个 Python 脚本 + 2 个 Node 采集脚本
+├── rules/                   # 3 套合规规则包（railway-plan / lab-report / generic）
+├── scripts/                 # 17 个 Python 脚本 + 2 个 Node 采集脚本
 │   ├── _docx_utils.py       # 共享工具（XML解析、样式链、编号解析等）
 │   ├── analyze_docx.py      # 文档分析 → Document Specification
 │   ├── generate_docx.py     # 模板/spec 内生成
 │   ├── validate_docx.py     # 格式差异 + 结构体检
+│   ├── review.py            # 一键合规体检（打分 + 问题清单 + HTML 报告）
 │   ├── render_docx.py       # docx → PDF → 逐页 PNG
 │   ├── repair_docx.py       # 自动修复（dry-run 默认）
 │   ├── verify_evidence.py   # 截图证据对账（标签数/图片数/空图/宽黑条/变形）
@@ -152,11 +187,11 @@ word-document-skill/
 │   ├── document-spec.json   # analyze 输出格式
 │   ├── content-model.json   # generate 输入格式
 │   └── task-model.json      # 任务识别模型
-├── workflows/               # 9 种任务类型的工作流指南
-├── references/              # 9 篇通用深度规则文档
+├── workflows/               # 10 种任务类型的工作流指南
+├── references/              # 10 篇通用深度规则文档
 │   └── lab-report/          # 实验报告专用：配置字段、离屏采集、通用/本类/个案分档说明
 ├── evals/                   # 集成测试用例（4 个场景）
-├── tests/                   # 单元测试（pytest，73 项）
+├── tests/                   # 单元测试（pytest，82 项）
 ├── examples/                # content.json 示例
 └── .github/                 # CI + Issue Templates
 ```
