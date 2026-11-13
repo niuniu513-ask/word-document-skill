@@ -61,3 +61,31 @@ jobs:
               jsonschema.Draft7Validator.check_schema(schema)
               print(f'OK: {s}')
           "
+
+  engine:
+    name: MoonBit engine
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install the MoonBit toolchain
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
+          echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
+
+      - name: Refresh the package registry
+        run: moon update
+
+      - name: Check the engine
+        working-directory: engine
+        run: moon check --target js
+
+      - name: Test the engine
+        working-directory: engine
+        run: moon test --target js
+
+      - name: CLI smoke test
+        working-directory: engine
+        run: |
+          moon run cmd/docx --target js -- info tests/fixtures/mini.docx
+          moon run cmd/docx --target js -- issues tests/fixtures/mini.docx

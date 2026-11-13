@@ -6,9 +6,8 @@ plain Python install still runs the whole suite.
 """
 from __future__ import annotations
 
-import pytest
-
 import mbt_engine as mbt
+import pytest
 
 pytestmark = pytest.mark.skipif(
     not mbt.available(),
