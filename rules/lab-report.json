@@ -1,0 +1,111 @@
+{
+  "id": "lab-report",
+  "name": "实验报告（规范性检查）",
+  "description": "课程实验报告的要素完整性与格式一致性自查，对应 workflows/lab-report-runbook.md 的证据要求。",
+  "required_sections": [
+    {
+      "key": "实验目的",
+      "aliases": [
+        "实验目的",
+        "目的"
+      ]
+    },
+    {
+      "key": "实验原理",
+      "aliases": [
+        "实验原理",
+        "原理"
+      ]
+    },
+    {
+      "key": "实验器材",
+      "aliases": [
+        "实验器材",
+        "实验设备",
+        "仪器",
+        "器材"
+      ]
+    },
+    {
+      "key": "实验步骤",
+      "aliases": [
+        "实验步骤",
+        "实验过程",
+        "步骤",
+        "操作过程"
+      ]
+    },
+    {
+      "key": "实验结果",
+      "aliases": [
+        "实验结果",
+        "结果",
+        "实验数据",
+        "数据记录"
+      ]
+    },
+    {
+      "key": "结果分析",
+      "aliases": [
+        "结果分析",
+        "数据分析",
+        "讨论"
+      ]
+    },
+    {
+      "key": "结论",
+      "aliases": [
+        "结论",
+        "实验结论",
+        "总结",
+        "心得体会"
+      ]
+    }
+  ],
+  "heading": {
+    "max_level": 3,
+    "numbering": "auto-or-chinese",
+    "forbid_level_jump": true
+  },
+  "body": {
+    "allowed_sizes_pt": [
+      10.5,
+      12.0,
+      14.0
+    ],
+    "allowed_east_asia_fonts": [
+      "宋体",
+      "SimSun",
+      "仿宋",
+      "FangSong",
+      "黑体",
+      "SimHei"
+    ],
+    "max_consecutive_empty": 2,
+    "min_body_paragraphs": 6
+  },
+  "page": {
+    "require_page_number": true,
+    "require_header": false,
+    "allowed_page_sizes": [
+      "A4"
+    ]
+  },
+  "placeholders": {
+    "patterns": [
+      "【[^】]{0,60}】",
+      "_{4,}",
+      "＿{4,}"
+    ],
+    "forbid": true
+  },
+  "forbidden_phrases": [
+    "待定",
+    "TBD",
+    "XXX"
+  ],
+  "tables": {
+    "require_header_bold": false,
+    "max_cols": 8
+  }
+}

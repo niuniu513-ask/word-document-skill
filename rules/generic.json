@@ -1,0 +1,42 @@
+{
+  "id": "generic",
+  "name": "通用文档体检",
+  "description": "不针对具体业务，只查结构与格式健康度：章节完整性、层级、占位符、空段落、字体字号。",
+  "required_sections": [],
+  "heading": {
+    "max_level": 4,
+    "numbering": "any",
+    "forbid_level_jump": true
+  },
+  "body": {
+    "allowed_sizes_pt": [],
+    "allowed_east_asia_fonts": [],
+    "max_consecutive_empty": 2,
+    "min_body_paragraphs": 1
+  },
+  "page": {
+    "require_page_number": false,
+    "require_header": false,
+    "allowed_page_sizes": [
+      "A4",
+      "A3",
+      "B5"
+    ]
+  },
+  "placeholders": {
+    "patterns": [
+      "【[^】]{0,60}】",
+      "_{4,}",
+      "＿{4,}"
+    ]
+  },
+  "forbidden_phrases": [
+    "TBD",
+    "XXX",
+    "待定"
+  ],
+  "tables": {
+    "require_header_bold": false,
+    "max_cols": 20
+  }
+}

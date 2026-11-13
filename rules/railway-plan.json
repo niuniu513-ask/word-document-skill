@@ -1,0 +1,145 @@
+{
+  "id": "railway-plan",
+  "name": "铁路施工方案（报审自查）",
+  "description": "工务／信号专业施工方案报审前的格式与要件自查。缺章节、缺依据、缺签字页往往直接退回。",
+  "required_sections": [
+    {
+      "key": "工程概况",
+      "aliases": [
+        "工程概况",
+        "工程概述",
+        "工程简介",
+        "概况"
+      ]
+    },
+    {
+      "key": "编制依据",
+      "aliases": [
+        "编制依据",
+        "依据",
+        "编制说明"
+      ]
+    },
+    {
+      "key": "施工组织",
+      "aliases": [
+        "施工组织",
+        "施工部署",
+        "组织机构",
+        "施工安排"
+      ]
+    },
+    {
+      "key": "施工方案",
+      "aliases": [
+        "施工方案",
+        "施工方法",
+        "施工工艺",
+        "作业方法"
+      ]
+    },
+    {
+      "key": "进度计划",
+      "aliases": [
+        "进度计划",
+        "工期安排",
+        "施工计划"
+      ]
+    },
+    {
+      "key": "资源配置",
+      "aliases": [
+        "资源配置",
+        "人员配置",
+        "机具",
+        "材料计划",
+        "劳动力"
+      ]
+    },
+    {
+      "key": "安全保证措施",
+      "aliases": [
+        "安全保证措施",
+        "安全措施",
+        "安全防护"
+      ]
+    },
+    {
+      "key": "质量保证措施",
+      "aliases": [
+        "质量保证措施",
+        "质量措施",
+        "质量控制"
+      ]
+    },
+    {
+      "key": "应急预案",
+      "aliases": [
+        "应急预案",
+        "应急措施",
+        "应急处置"
+      ]
+    },
+    {
+      "key": "文明施工",
+      "aliases": [
+        "文明施工",
+        "环境保护",
+        "环保措施"
+      ]
+    }
+  ],
+  "heading": {
+    "max_level": 3,
+    "numbering": "auto-or-chinese",
+    "forbid_level_jump": true
+  },
+  "body": {
+    "allowed_sizes_pt": [
+      10.5,
+      12.0,
+      14.0,
+      16.0
+    ],
+    "allowed_east_asia_fonts": [
+      "仿宋",
+      "仿宋_GB2312",
+      "FangSong",
+      "宋体",
+      "SimSun",
+      "黑体",
+      "SimHei",
+      "楷体",
+      "KaiTi"
+    ],
+    "max_consecutive_empty": 2,
+    "min_body_paragraphs": 10
+  },
+  "page": {
+    "require_page_number": true,
+    "require_header": false,
+    "allowed_page_sizes": [
+      "A4"
+    ]
+  },
+  "placeholders": {
+    "patterns": [
+      "【[^】]{0,60}】",
+      "_{4,}",
+      "＿{4,}"
+    ],
+    "forbid": true
+  },
+  "forbidden_phrases": [
+    "待定",
+    "TBD",
+    "XXX",
+    "xxx",
+    "？？",
+    "占位"
+  ],
+  "tables": {
+    "require_header_bold": false,
+    "max_cols": 12
+  }
+}
