@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - README 新增「双实现：Python 与原生 MoonBit 引擎」一节，说明两套实现的分工、调用方式与交叉验证结果。
 
 ### Fixed
+- CI：`test` 作业自 v1.3.0 起在收集阶段失败（`ModuleNotFoundError: No module named 'nbformat'`）。改为安装 `requirements-notebook.txt`，并让 `tests/test_lab_report.py` 在缺少 notebook 依赖时 skip 而不是中断收集。
 - 引擎：程序化创建的 XML 节点丢失命名空间前缀，填充后的文字在 Word 中不可见（写成 `<t>` 而非 `<w:t>`）；序列化器改为按作用域补齐 `xmlns`，并补回归测试。
 
 
