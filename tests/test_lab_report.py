@@ -10,7 +10,6 @@ from PIL import Image, ImageDraw
 from verify_evidence import main as verify_main
 from verify_evidence import verify_docx
 
-
 # The lab-report workflow needs nbformat; a plain install without the notebook
 # extras should skip these tests instead of failing collection.
 nbformat = pytest.importorskip("nbformat")
